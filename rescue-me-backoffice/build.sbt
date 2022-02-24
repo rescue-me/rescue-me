@@ -6,7 +6,14 @@ version := "1.0"
 Configuration.settings
 
 /** ********* PROD DEPENDENCIES *****************/
+val CatsVersion = "2.6.1"
+val Http4sVersion = "0.21.28"
+
 libraryDependencies ++= Seq(
+  "org.typelevel" %% "cats-core" % CatsVersion,
+  "org.http4s" %% "http4s-blaze-server" % Http4sVersion,
+  "org.http4s" %% "http4s-circe" % Http4sVersion,
+  "org.http4s" %% "http4s-dsl" % Http4sVersion,
   "com.github.nscala-time" %% "nscala-time" % "2.22.0",
   "com.lihaoyi"            %% "pprint"      % "0.5.6"
 )
