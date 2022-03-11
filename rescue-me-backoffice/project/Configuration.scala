@@ -4,7 +4,7 @@ import sbt.Keys._
 object Configuration {
   val settings = Seq(
     organization := "rescueme.com",
-    scalaVersion := "2.12.7",
+    scalaVersion := "2.12.8",
 
     // Custom folders path (/src/main/scala and /src/test/scala by default)
     scalaSource in Compile := baseDirectory.value / "/src/main",

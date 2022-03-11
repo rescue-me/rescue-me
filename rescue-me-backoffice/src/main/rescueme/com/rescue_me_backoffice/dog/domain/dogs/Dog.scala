@@ -1,4 +1,4 @@
-package rescueme.com.rescue_me_backoffice.domain.dogs
+package rescueme.com.rescue_me_backoffice.dog.domain.dogs
 
 case class Dog(
                 id: DogId,
