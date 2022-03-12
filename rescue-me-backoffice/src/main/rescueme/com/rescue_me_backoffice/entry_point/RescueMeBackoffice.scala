@@ -1,10 +1,12 @@
-package rescueme.com.rescue_me_backoffice
+package rescueme.com.rescue_me_backoffice.entry_point
 
 import akka.actor.ActorSystem
 import com.typesafe.config.ConfigFactory
-import rescueme.com.rescue_me_backoffice.entry_point.{Controller, HttpServerConfig}
+import rescueme.com.rescue_me_backoffice.system.akka.{Controller, HttpServerConfig}
+import rescueme.com.rescue_me_backoffice.system.domain.System
+import rescueme.com.rescue_me_backoffice.system.repositories.SystemRepositories
 
-import scala.concurrent.ExecutionContextExecutor
+import scala.concurrent.{ExecutionContextExecutor, Future}
 
 object RescueMeBackoffice extends App {
 
@@ -14,6 +16,7 @@ object RescueMeBackoffice extends App {
 
   implicit val actorSystem: ActorSystem = ActorSystem(actorSystemName)
   implicit val executionContext: ExecutionContextExecutor = actorSystem.dispatcher
+  implicit val systemRepositories: System[Future] = new SystemRepositories
 
   val controller = Controller()
 

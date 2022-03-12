@@ -1,4 +1,4 @@
-package rescueme.com.rescue_me_backoffice.entry_point
+package rescueme.com.rescue_me_backoffice.system.akka
 
 import com.typesafe.config.Config
 

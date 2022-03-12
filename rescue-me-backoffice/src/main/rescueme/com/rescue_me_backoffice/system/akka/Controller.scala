@@ -1,12 +1,13 @@
-package rescueme.com.rescue_me_backoffice.entry_point
+package rescueme.com.rescue_me_backoffice.system.akka
 
 import akka.actor.ActorSystem
 import akka.http.scaladsl.Http
 
-import scala.concurrent.ExecutionContext
+import scala.concurrent.{ExecutionContext, Future}
 import scala.io.StdIn
+import rescueme.com.rescue_me_backoffice.system.domain.System
 
-final case class Controller()(implicit ec: ExecutionContext) {
+final case class Controller()(implicit ec: ExecutionContext, system: System[Future]) {
 
   val routes = new Routes()
 
