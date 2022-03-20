@@ -18,18 +18,21 @@ import rescueme.com.app.infrastructure.inmemory.DogRepositoryInMemoryInterpreter
 
 class DogEndpointSpec extends AnyFunSuite with Matchers with Http4sDsl[IO] with Http4sClientDsl[IO] {
 
-  implicit val decoder: Decoder[Dog] = deriveDecoder
+  implicit val decoder: Decoder[Dog]                 = deriveDecoder
   implicit val entityDecoder: EntityDecoder[IO, Dog] = jsonOf[IO, Dog]
   val dogRepo: DogRepositoryInMemoryInterpreter[IO]  = DogRepositoryInMemoryInterpreter[IO]
   val dogService: DogService[IO]                     = DogService(dogRepo)
   val router: HttpApp[IO]                            = Router("/dogs" -> DogEndpoint.endpoints[IO](dogService)).orNotFound
 
   test("Should return ok") {
-
-    val response: Response[IO] = GET(uri"/dogs").flatMap(router.run(_)).unsafeRunSync()
-    response.status shouldEqual Ok
-    val dogList: List[Dog] = response.as[List[Dog]].unsafeRunSync()
-    println(dogList)
+    (for {
+      req  <- GET(uri"/dogs")
+      resp <- router.run(req)
+      body <- resp.as[List[Dog]]
+    } yield {
+      resp.status shouldEqual Ok
+      println(body)
+    }).unsafeRunSync()
 
   }
 }
