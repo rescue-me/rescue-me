@@ -1,7 +1,6 @@
 package rescueme.com.app
 
 import cats.effect._
-import cats.implicits._
 import doobie.util.ExecutionContexts
 import org.http4s.implicits._
 import org.http4s.server.blaze.BlazeServerBuilder
