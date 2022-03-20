@@ -1,8 +1,12 @@
 package rescueme.com.rescue_me_backoffice.dog.domain
 
-trait DogService[F[_]] {
+import cats.Functor
+import cats.data.EitherT
 
-  def register(dog: Dog): Unit
+class DogService[F[_]](repositoryAlgebra: DogRepositoryAlgebra[F]) {
 
-  def all(): F[Seq[Dog]]
+  def register(dog: Dog)(implicit M: Functor[F]): EitherT[F, Throwable, Dog] =
+    EitherT.liftF(repositoryAlgebra.register(dog))
+
+  def all(): F[List[Dog]] = repositoryAlgebra.list()
 }

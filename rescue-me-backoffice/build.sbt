@@ -26,6 +26,7 @@ libraryDependencies ++= Seq(
   "org.scalamock" %% "scalamock" % "4.4.0" % Test,
   "com.typesafe.akka" %% "akka-http-testkit" % akkaHttpVersion,
   "org.scalatest" %% "scalatest" % scalaTestVersion,
+  "org.typelevel" %% "cats-core" % "2.7.0",
   "com.typesafe.akka" %% "akka-testkit" % akkaVersion
 )
 
