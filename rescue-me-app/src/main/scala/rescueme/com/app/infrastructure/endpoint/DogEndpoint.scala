@@ -24,9 +24,23 @@ class DogEndpoint[F[_]: Sync] extends Http4sDsl[F] {
         } yield resp
     }
 
+  private def createDog(dogService: DogService[F]): HttpRoutes[F] = {
+    HttpRoutes.of[F] {
+      case req @ POST -> Root =>
+        val result = for {
+          dog <- req.as[Dog]
+          res <- dogService.create(dog).value
+        } yield res
+        result.flatMap {
+          case Right(dogCreated) => Ok(dogCreated.asJson)
+          case Left(_)           => Conflict(s"A dog with these fields already exists")
+        }
+    }
+  }
+
   def endpoints(
       dogService: DogService[F]
-  ): HttpRoutes[F] = findAllDogs(dogService)
+  ): HttpRoutes[F] = findAllDogs(dogService) <+> createDog(dogService)
 }
 
 object DogEndpoint {

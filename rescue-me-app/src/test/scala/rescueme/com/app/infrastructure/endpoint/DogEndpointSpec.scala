@@ -31,7 +31,7 @@ class DogEndpointSpec extends AnyFunSuite with Matchers with Http4sDsl[IO] with 
       body <- resp.as[List[Dog]]
     } yield {
       resp.status shouldEqual Ok
-      println(body)
+      body.isEmpty
     }).unsafeRunSync()
 
   }
