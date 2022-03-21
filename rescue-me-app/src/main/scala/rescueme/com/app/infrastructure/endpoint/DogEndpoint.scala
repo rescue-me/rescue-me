@@ -1,14 +1,12 @@
 package rescueme.com.app.infrastructure.endpoint
 
-import cats.data._
 import cats.effect.Sync
 import cats.syntax.all._
 import io.circe.generic.auto._
-import io.circe.generic.auto._
 import io.circe.syntax._
 import org.http4s.circe._
-import org.http4s.{EntityDecoder, HttpRoutes}
 import org.http4s.dsl.Http4sDsl
+import org.http4s.{EntityDecoder, HttpRoutes}
 import rescueme.com.app.domain.dog.{Dog, DogService}
 
 class DogEndpoint[F[_]: Sync] extends Http4sDsl[F] {

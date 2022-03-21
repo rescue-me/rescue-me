@@ -18,7 +18,7 @@ class DogRepositoryInMemoryInterpreter[F[_]: Monad] extends DogRepositoryAlgebra
   override def create(dog: Dog): F[Dog] = {
     val toSave = dog.copy(id = dog.id.orElse(UUID.randomUUID().some))
     cache.put(toSave.id.get, toSave)
-    dog.pure[F]
+    toSave.pure[F]
   }
 }
 
