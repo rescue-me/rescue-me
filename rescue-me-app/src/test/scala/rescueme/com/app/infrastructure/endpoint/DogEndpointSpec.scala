@@ -15,7 +15,7 @@ import org.scalatest.matchers.should.Matchers.convertToAnyShouldWrapper
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
 import rescueme.com.app.Arbitraries
 import rescueme.com.app.domain.dog.{Dog, DogService}
-import rescueme.com.app.infrastructure.inmemory.DogRepositoryInMemoryInterpreter
+import rescueme.com.app.infrastructure.repository.inmemory.DogRepositoryInMemoryInterpreter
 
 class DogEndpointSpec
     extends AnyFunSuite

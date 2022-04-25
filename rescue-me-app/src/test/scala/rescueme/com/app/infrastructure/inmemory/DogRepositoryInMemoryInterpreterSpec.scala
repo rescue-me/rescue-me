@@ -7,6 +7,7 @@ import org.scalatest.matchers.should.Matchers.convertToAnyShouldWrapper
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
 import rescueme.com.app.Arbitraries
 import rescueme.com.app.domain.dog.Dog
+import rescueme.com.app.infrastructure.repository.inmemory.DogRepositoryInMemoryInterpreter
 
 class DogRepositoryInMemoryInterpreterSpec
     extends AnyFunSuite

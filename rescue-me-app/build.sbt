@@ -1,6 +1,6 @@
 ThisBuild / version := "0.1.0-SNAPSHOT"
 
-ThisBuild / scalaVersion := "2.13.8"
+ThisBuild / scalaVersion := "2.13.6"
 
 lazy val root = (project in file("."))
   .settings(
@@ -17,6 +17,7 @@ val ScalaTestVersion = "3.2.9"
 val ScalaTestPlusVersion = "3.2.2.0"
 
 libraryDependencies ++= Seq(
+  "com.typesafe" % "config" % "1.4.2",
   "org.http4s" %% "http4s-blaze-server" % Http4sVersion,
   "org.http4s" %% "http4s-circe" % Http4sVersion,
   "org.http4s" %% "http4s-dsl" % Http4sVersion,

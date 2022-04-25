@@ -7,7 +7,7 @@ import org.http4s.server.blaze.BlazeServerBuilder
 import org.http4s.server.{Router, Server => H4Server}
 import rescueme.com.app.domain.dog.DogService
 import rescueme.com.app.infrastructure.endpoint.DogEndpoint
-import rescueme.com.app.infrastructure.inmemory.DogRepositoryInMemoryInterpreter
+import rescueme.com.app.infrastructure.repository.inmemory.DogRepositoryInMemoryInterpreter
 
 object Server extends IOApp {
 
@@ -25,6 +25,7 @@ object Server extends IOApp {
         .resource
     } yield server
 
-  override def run(args: List[String]): IO[ExitCode] = createServer.use(_ => IO.never).as(ExitCode.Success)
+  override def run(args: List[String]): IO[ExitCode] =
+    IO(println("Running server ...")) *> createServer.use(_ => IO.never).as(ExitCode.Success)
 
 }
