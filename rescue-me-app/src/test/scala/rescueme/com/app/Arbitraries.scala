@@ -11,7 +11,7 @@ trait Arbitraries {
       name        <- arbitrary[String]
       breed       <- arbitrary[String]
       description <- arbitrary[String]
-      id          <- Gen.option(Gen.uuid)
-    } yield Dog(name, breed, description, id)
+      id          <- Gen.option(Gen.long)
+    } yield Dog(id, name, breed, description)
   }
 }

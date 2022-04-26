@@ -1,0 +1,14 @@
+POST {{host}}:{{port}}/api/dog
+Accept: application/json
+Content-Type: application/json
+
+{
+  "name": "kira",
+  "breed": "Bulldog",
+  "description": "Good dog"
+}
+
+
+### Retrieve all
+GET {{host}}:{{port}}/api/dog
+Accept: application/json

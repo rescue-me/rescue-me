@@ -1,21 +1,23 @@
 package rescueme.com.app.domain.dog
 
-import cats.Functor
+import cats.Monad
 import cats.data.EitherT
+import cats.implicits._
 
-class DogService[F[_]](
-    repository: DogRepositoryAlgebra[F]
-) {
+class DogService[F[_]: Monad](repository: DogRepositoryAlgebra[F]) {
 
   def all(): F[List[Dog]] =
-    repository.all()
+    for {
+      list <- repository.all()
+      _    <- println(s"Retrieved list $list").pure[F]
+    } yield list
 
-  def create(dog: Dog)(implicit f: Functor[F]): EitherT[F, Throwable, Dog] =
+  def create(dog: Dog): EitherT[F, Throwable, Dog] =
     EitherT.liftF(repository.create(dog))
+
 }
 
 object DogService {
-  def apply[F[_]](
-      repositoryAlgebra: DogRepositoryAlgebra[F]
-  ): DogService[F] = new DogService[F](repositoryAlgebra)
+  def apply[F[_]: Monad](repositoryAlgebra: DogRepositoryAlgebra[F]): DogService[F] =
+    new DogService[F](repositoryAlgebra)
 }

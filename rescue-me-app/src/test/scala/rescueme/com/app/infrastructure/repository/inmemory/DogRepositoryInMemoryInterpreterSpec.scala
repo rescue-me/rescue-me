@@ -1,4 +1,4 @@
-package rescueme.com.app.infrastructure.inmemory
+package rescueme.com.app.infrastructure.repository.inmemory
 
 import org.scalatest.OptionValues
 import org.scalatest.funsuite.AnyFunSuite

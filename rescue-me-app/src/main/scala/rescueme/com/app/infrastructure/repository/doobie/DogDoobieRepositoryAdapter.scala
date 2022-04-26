@@ -1,37 +1,32 @@
 package rescueme.com.app.infrastructure.repository.doobie
 
 import cats.effect.Async
-import cats.implicits._
 import doobie._
 import doobie.implicits._
 import rescueme.com.app.domain.dog.{Dog, DogRepositoryAlgebra}
 
-import java.util.UUID
-
 object DogSql {
 
-  implicit val uuidMeta: Meta[UUID] = Meta[String].imap(UUID.fromString)( _.toString)
-
   def insert(dog: Dog): Update0 =
-    sql"""
-      INSERT INTO dog (NAME, BREED, DESCRIPTION) 
-      VALUES (${dog.name}, ${dog.breed}, ${dog.description})
-       """.update
+    sql"INSERT INTO dog (name, breed, description) VALUES (${dog.name}, ${dog.breed}, ${dog.description})".update
+
+  def getAll: Query0[Dog] =
+    sql"SELECT * FROM dog".query[Dog]
 }
-class DogDoobieRepositoryAdapter[P[_]: Async](val db: DoobieDbConnection[P]) extends DogRepositoryAlgebra[P] {
+class DogDoobieRepositoryAdapter[F[_]: Async](val xa: Transactor[F]) extends DogRepositoryAlgebra[F] {
 
   import DogSql._
-  override def all(): P[List[Dog]] = List[Dog]().pure[P]
+  override def all(): F[List[Dog]] = getAll.stream.compile.toList.transact(xa)
 
-  override def create(dog: Dog): P[Dog] =
+  override def create(dog: Dog): F[Dog] =
     insert(dog)
-      .withUniqueGeneratedKeys[UUID]("ID")
+      .withUniqueGeneratedKeys[Long]("id")
       .map(id => dog.copy(id = Some(id)))
-      .transact(db.transactor)
+      .transact(xa)
 
 }
 
 object DogDoobieRepositoryAdapter {
-  def apply[F[_]: Async](db: DoobieDbConnection[F]): DogDoobieRepositoryAdapter[F] =
-    new DogDoobieRepositoryAdapter[F](db)
+  def apply[F[_]: Async](xa: Transactor[F]): DogDoobieRepositoryAdapter[F] =
+    new DogDoobieRepositoryAdapter[F](xa)
 }

@@ -18,7 +18,11 @@ class DogEndpoint[F[_]: Sync] extends Http4sDsl[F] {
       case GET -> Root =>
         for {
           retrieved <- dogService.all()
-          resp      <- Ok(retrieved.asJson)
+          _         <- println(s"retrieved dogs: $retrieved").pure[F]
+          resp <- Ok(retrieved.asJson).handleErrorWith { thr =>
+            println(s"Error occured $thr")
+            InternalServerError()
+          }
         } yield resp
     }
 
@@ -28,6 +32,7 @@ class DogEndpoint[F[_]: Sync] extends Http4sDsl[F] {
         val result = for {
           dog <- req.as[Dog]
           res <- dogService.create(dog).value
+          _   <- println(s"Create dog was result: $res").pure[F]
         } yield res
         result.flatMap {
           case Right(dogCreated) => Ok(dogCreated.asJson)
