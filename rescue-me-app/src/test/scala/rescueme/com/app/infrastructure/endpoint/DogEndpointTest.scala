@@ -17,7 +17,7 @@ import rescueme.com.app.Arbitraries
 import rescueme.com.app.domain.dog.{Dog, DogService}
 import rescueme.com.app.infrastructure.repository.inmemory.DogRepositoryInMemoryInterpreter
 
-class DogEndpointSpec
+class DogEndpointTest
     extends AnyFunSuite
     with Matchers
     with Http4sDsl[IO]

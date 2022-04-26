@@ -2,16 +2,11 @@ package rescueme.com.app.domain.dog
 
 import cats.Monad
 import cats.data.EitherT
-import cats.implicits._
 
 class DogService[F[_]: Monad](repository: DogRepositoryAlgebra[F]) {
 
   def all(): F[List[Dog]] =
-    for {
-      list <- repository.all()
-      _    <- println(s"Retrieved list $list").pure[F]
-    } yield list
-
+    repository.all()
   def create(dog: Dog): EitherT[F, Throwable, Dog] =
     EitherT.liftF(repository.create(dog))
 

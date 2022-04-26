@@ -11,7 +11,7 @@ import rescueme.com.app.domain.dog.Dog
 
 import scala.concurrent.ExecutionContext
 
-class DogDoobieRepositoryAdapterITSpec extends AsyncFlatSpec with Matchers with BeforeAndAfterAll {
+class DogDoobieRepositoryAdapterTest extends AsyncFlatSpec with Matchers with BeforeAndAfterAll {
 
   implicit private val ioContextShift: ContextShift[IO] = IO.contextShift(ExecutionContext.global)
 
