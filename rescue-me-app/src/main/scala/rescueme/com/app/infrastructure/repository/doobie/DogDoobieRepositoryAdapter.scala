@@ -10,9 +10,11 @@ object DogSql {
   def insert(dog: Dog): Update0 =
     sql"INSERT INTO dog (name, breed, description) VALUES (${dog.name}, ${dog.breed}, ${dog.description})".update
 
-  def getAll: Query0[Dog] =
-    sql"SELECT * FROM dog".query[Dog]
+  def getAll: Query0[Dog] = sql"SELECT * FROM dog".query[Dog]
+
+  def get(id: Long): Query0[Dog] = sql"SELECT * FROM dog where id=$id".query[Dog]
 }
+
 class DogDoobieRepositoryAdapter[F[_]: Async](val xa: Transactor[F]) extends DogRepositoryAlgebra[F] {
 
   import DogSql._
@@ -24,6 +26,7 @@ class DogDoobieRepositoryAdapter[F[_]: Async](val xa: Transactor[F]) extends Dog
       .map(id => dog.copy(id = Some(id)))
       .transact(xa)
 
+  override def get(id: Long): F[Option[Dog]] = DogSql.get(id).option.transact(xa)
 }
 
 object DogDoobieRepositoryAdapter {

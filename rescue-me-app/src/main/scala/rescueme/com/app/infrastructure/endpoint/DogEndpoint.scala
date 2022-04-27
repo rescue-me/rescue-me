@@ -32,7 +32,6 @@ class DogEndpoint[F[_]: Sync] extends Http4sDsl[F] {
         val result = for {
           dog <- req.as[Dog]
           res <- dogService.create(dog).value
-          _   <- println(s"Create dog was result: $res").pure[F]
         } yield res
         result.flatMap {
           case Right(dogCreated) => Ok(dogCreated.asJson)
@@ -41,9 +40,22 @@ class DogEndpoint[F[_]: Sync] extends Http4sDsl[F] {
     }
   }
 
+  private def get(dogService: DogService[F]): HttpRoutes[F] = {
+    HttpRoutes.of[F] {
+      case GET -> Root / LongVar(id) =>
+        dogService.get(id).value flatMap {
+          case Left(_)    => BadRequest(s"Dog with id: $id not found")
+          case Right(dog) => Ok(dog.asJson)
+        }
+    }
+  }
+
   def endpoints(
       dogService: DogService[F]
-  ): HttpRoutes[F] = findAllDogs(dogService) <+> createDog(dogService)
+  ): HttpRoutes[F] =
+    findAllDogs(dogService) <+>
+      createDog(dogService) <+>
+      get(dogService)
 }
 
 object DogEndpoint {

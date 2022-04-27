@@ -12,15 +12,15 @@ class DogRepositoryInMemoryInterpreter[F[_]: Monad] extends DogRepositoryAlgebra
 
   private val cache = new TrieMap[Long, Dog]
 
-  override def all(): F[List[Dog]] = {
-    cache.values.toList.pure[F]
-  }
+  override def all(): F[List[Dog]] = cache.values.toList.pure[F]
 
   override def create(dog: Dog): F[Dog] = {
     val toSave = dog.copy(id = dog.id.orElse(Random.nextLong().some))
     cache.put(toSave.id.get, toSave)
     toSave.pure[F]
   }
+
+  override def get(id: Long): F[Option[Dog]] = cache.get(id).pure[F]
 }
 
 object DogRepositoryInMemoryInterpreter {
