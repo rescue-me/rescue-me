@@ -4,14 +4,14 @@ import cats.effect.{ContextShift, IO}
 import com.dimafeng.testcontainers.{Container, ForAllTestContainer, PostgreSQLContainer}
 import doobie.implicits._
 import doobie.util.transactor.Transactor
-import org.scalatest.BeforeAndAfterAll
+import org.scalatest.{BeforeAndAfterAll, OptionValues}
 import org.scalatest.flatspec.AsyncFlatSpec
 import org.scalatest.matchers.should.Matchers
 import rescueme.com.app.domain.dog.Dog
 
 import scala.concurrent.ExecutionContext
 
-class DogDoobieRepositoryAdapterTest extends AsyncFlatSpec with Matchers with BeforeAndAfterAll {
+class DogDoobieRepositoryAdapterTest extends AsyncFlatSpec with Matchers with BeforeAndAfterAll with OptionValues {
 
   implicit private val ioContextShift: ContextShift[IO] = IO.contextShift(ExecutionContext.global)
 
@@ -48,12 +48,14 @@ class DogDoobieRepositoryAdapterTest extends AsyncFlatSpec with Matchers with Be
 
     val dog = Dog("budy-test", "tester", "testing doobie")
 
-    val (saved, all) = (for {
+    (for {
       saved <- repository.create(dog)
       all   <- repository.all()
-    } yield (saved, all)).unsafeRunSync()
-
-    all should contain(saved)
+      byId  <- repository.get(saved.id.value)
+    } yield {
+      all should contain(saved)
+      saved shouldBe byId.value
+    }).unsafeRunSync()
 
   }
 
