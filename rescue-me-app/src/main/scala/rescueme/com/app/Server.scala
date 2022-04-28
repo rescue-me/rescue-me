@@ -9,8 +9,9 @@ import org.http4s.server.blaze.BlazeServerBuilder
 import org.http4s.server.{Router, Server => H4Server}
 import rescueme.com.app.config.{DatabaseConfig, RescuemeConfig}
 import rescueme.com.app.domain.dog.DogService
-import rescueme.com.app.infrastructure.endpoint.DogEndpoint
-import rescueme.com.app.infrastructure.repository.doobie.DogDoobieRepositoryAdapter
+import rescueme.com.app.domain.shelter.ShelterService
+import rescueme.com.app.infrastructure.endpoint.{DogEndpoint, ShelterEndpoint}
+import rescueme.com.app.infrastructure.repository.doobie.{DogDoobieRepositoryAdapter, ShelterDoobieRepositoryAdapter}
 
 object Server extends IOApp {
 
@@ -22,10 +23,13 @@ object Server extends IOApp {
       txnEc    <- ExecutionContexts.cachedThreadPool[F]
       xa       <- DatabaseConfig.dbTransactor(conf.db, connEc, Blocker.liftExecutionContext(txnEc))
       serverEc <- ExecutionContexts.cachedThreadPool[F]
-      dogRepo    = DogDoobieRepositoryAdapter[F](xa)
-      dogService = DogService(dogRepo)
+      dogRepo        = DogDoobieRepositoryAdapter[F](xa)
+      dogService     = DogService(dogRepo)
+      shelterRepo    = ShelterDoobieRepositoryAdapter[F](xa)
+      shelterService = new ShelterService[F](shelterRepo)
       httpApp = Router(
-        "/api/dog" -> DogEndpoint.endpoints(dogService)
+        "/api/dog"     -> DogEndpoint.endpoints(dogService),
+        "/api/shelter" -> ShelterEndpoint.endpoints(shelterService)
       ).orNotFound
       server <- BlazeServerBuilder[F](serverEc)
         .bindHttp(8080, "localhost")
