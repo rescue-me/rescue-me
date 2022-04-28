@@ -15,13 +15,17 @@ object ShelterSql {
   def get(id: Long): Query0[Shelter] = sql"SELECT * FROM shelter where id=$id".query[Shelter]
 
 }
-class ShelterDoobieRepositoryAdapter[F[_]](val xa: Transactor[F]) extends ShelterRepositoryAlgebra[F] {
+class ShelterDoobieRepositoryAdapter[F[_]: Async](val xa: Transactor[F]) extends ShelterRepositoryAlgebra[F] {
 
-  override def all(): F[List[Shelter]] = ???
+  import ShelterSql._
 
-  override def create(shelter: Shelter): F[Shelter] = ???
-
-  override def get(id: Long): F[Option[Shelter]] = ???
+  override def all(): F[List[Shelter]]           = getAll.stream.compile.toList.transact(xa)
+  override def get(id: Long): F[Option[Shelter]] = ShelterSql.get(id).option.transact(xa)
+  override def create(shelter: Shelter): F[Shelter] =
+    insert(shelter)
+      .withUniqueGeneratedKeys[Long]("id")
+      .map(id => shelter.copy(id = Some(id)))
+      .transact(xa)
 }
 object ShelterDoobieRepositoryAdapter {
   def apply[F[_]: Async](xa: Transactor[F]) = new ShelterDoobieRepositoryAdapter[F](xa)

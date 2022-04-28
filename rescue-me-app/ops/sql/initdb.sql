@@ -2,7 +2,7 @@
 CREATE DATABASE rescueme;
 \c rescueme;
 
-CREATE TABLE shelters
+CREATE TABLE shelter
 (
     id       serial            NOT NULL,
     PRIMARY KEY (id),
@@ -19,11 +19,11 @@ CREATE TABLE dog
     description character varying NOT NULL
 );
 
-INSERT INTO shelters (name, province)
+INSERT INTO shelter (name, province)
 VALUES ('Casa de acogida Madrid', 'Madrid'),
        ('Casa de acogida galicia', 'Galicia'),
        ('Casa de acogida Guadalajara', 'Guadalajara'),
        ('Casa de acogida Toledo', 'Toledo');
 
-ALTER TABLE shelters REPLICA IDENTITY FULL;
+ALTER TABLE shelter REPLICA IDENTITY FULL;
 COMMIT;

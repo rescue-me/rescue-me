@@ -18,15 +18,14 @@ object DogSql {
 class DogDoobieRepositoryAdapter[F[_]: Async](val xa: Transactor[F]) extends DogRepositoryAlgebra[F] {
 
   import DogSql._
-  override def all(): F[List[Dog]] = getAll.stream.compile.toList.transact(xa)
 
+  override def all(): F[List[Dog]]           = getAll.stream.compile.toList.transact(xa)
+  override def get(id: Long): F[Option[Dog]] = DogSql.get(id).option.transact(xa)
   override def create(dog: Dog): F[Dog] =
     insert(dog)
       .withUniqueGeneratedKeys[Long]("id")
       .map(id => dog.copy(id = Some(id)))
       .transact(xa)
-
-  override def get(id: Long): F[Option[Dog]] = DogSql.get(id).option.transact(xa)
 }
 
 object DogDoobieRepositoryAdapter {

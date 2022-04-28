@@ -18,7 +18,6 @@ object Server extends IOApp {
   def createServer[F[_]: ContextShift: ConcurrentEffect: Timer]: Resource[F, H4Server[F]] =
     for {
       conf     <- Resource.eval(parser.decodePathF[F, RescuemeConfig]("application"))
-      serverEc <- ExecutionContexts.cachedThreadPool[F]
       connEc   <- ExecutionContexts.fixedThreadPool[F](conf.db.connections.poolSize)
       txnEc    <- ExecutionContexts.cachedThreadPool[F]
       xa       <- DatabaseConfig.dbTransactor(conf.db, connEc, Blocker.liftExecutionContext(txnEc))
@@ -26,7 +25,7 @@ object Server extends IOApp {
       dogRepo        = DogDoobieRepositoryAdapter[F](xa)
       dogService     = DogService(dogRepo)
       shelterRepo    = ShelterDoobieRepositoryAdapter[F](xa)
-      shelterService = new ShelterService[F](shelterRepo)
+      shelterService = ShelterService[F](shelterRepo)
       httpApp = Router(
         "/api/dog"     -> DogEndpoint.endpoints(dogService),
         "/api/shelter" -> ShelterEndpoint.endpoints(shelterService)

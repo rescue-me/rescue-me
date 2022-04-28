@@ -1,0 +1,18 @@
+### Retrieve all
+GET {{host}}:{{port}}/api/shelter
+Accept: application/json
+
+
+### Create shelter
+POST {{host}}:{{port}}/api/shelter
+Accept: application/json
+Content-Type: application/json
+
+{
+  "name": "shelter-from-api",
+  "province": "Galicia"
+}
+
+### Retrieve by id
+GET {{host}}:{{port}}/api/shelter/1
+Accept: application/json
