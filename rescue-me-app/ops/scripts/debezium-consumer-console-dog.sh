@@ -1,6 +1,2 @@
 #!/usr/bin/env bash
-kafka-console-consumer \
-  --bootstrap-server localhost:29092 \
-  --from-beginning \
-  --formatter io.confluent.kafka.formatter.AvroMessageFormatter \
-  --topic pg-dev.public.dog
+kcat -b localhost:29092 -t pg-dev.public.dog -s value=avro -r http://localhost:8081

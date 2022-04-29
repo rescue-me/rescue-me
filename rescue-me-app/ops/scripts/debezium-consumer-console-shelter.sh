@@ -1,6 +1,2 @@
 #!/usr/bin/env bash
-kafka-console-consumer \
-  --bootstrap-server localhost:29092 \
-  --from-beginning \
-  --property value.converter=io.confluent.connect.avro.AvroConverter \
-  --topic pg-dev.public.shelter
+kcat -b localhost:29092 -t pg-dev.public.shelter -s value=avro -r http://localhost:8081
