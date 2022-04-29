@@ -4,7 +4,6 @@ import cats._
 import cats.syntax.all._
 import rescueme.com.app.domain.dog.{Dog, DogRepositoryAlgebra}
 
-import java.util.UUID
 import scala.collection.concurrent.TrieMap
 import scala.util.Random
 

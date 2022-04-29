@@ -9,7 +9,7 @@ Accept: application/json
 Content-Type: application/json
 
 {
-  "name": "test-connect-again",
+  "name": "test-connect-again-jq",
   "province": "Galicia"
 }
 
