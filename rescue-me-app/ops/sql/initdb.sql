@@ -26,4 +26,5 @@ VALUES ('Casa de acogida Madrid', 'Madrid'),
        ('Casa de acogida Toledo', 'Toledo');
 
 ALTER TABLE shelter REPLICA IDENTITY FULL;
+ALTER TABLE dog REPLICA IDENTITY FULL;
 COMMIT;
