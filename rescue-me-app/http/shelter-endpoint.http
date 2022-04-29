@@ -9,7 +9,7 @@ Accept: application/json
 Content-Type: application/json
 
 {
-  "name": "shelter-from-api",
+  "name": "test-connect",
   "province": "Galicia"
 }
 
