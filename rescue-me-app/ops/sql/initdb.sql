@@ -1,6 +1,8 @@
 -- Database
-CREATE DATABASE rescueme;
-\c rescueme;
+CREATE
+DATABASE rescueme;
+\c
+rescueme;
 
 CREATE TABLE shelter
 (
@@ -12,11 +14,12 @@ CREATE TABLE shelter
 
 CREATE TABLE dog
 (
-    id          serial              NOT NULL,
+    id          serial            NOT NULL,
     PRIMARY KEY (id),
-    name     character varying NOT NULL,
+    name        character varying NOT NULL,
     breed       character varying NOT NULL,
-    description character varying NOT NULL
+    description character varying NOT NULL,
+    shelter_id  serial            NOT NULL
 );
 
 INSERT INTO shelter (name, province)
