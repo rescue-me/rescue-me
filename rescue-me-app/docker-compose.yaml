@@ -18,7 +18,7 @@ services:
 
   kafka:
     image: confluentinc/cp-kafka:7.1.1
-    depends_on: [zookeeper]
+    depends_on: [ zookeeper ]
     environment:
       KAFKA_ZOOKEEPER_CONNECT: "zookeeper:2181"
       KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
@@ -47,9 +47,18 @@ services:
       CONNECT_VALUE_CONVERTER_SCHEMA_REGISTRY_URL: http://schema-registry:8081
       CONNECT_PLUGIN_PATH: "/usr/share/java,/usr/share/confluent-hub-components"
       CONNECT_LOG4J_LOGGERS: org.apache.zookeeper=ERROR,org.I0Itec.zkclient=ERROR,org.reflections=ERROR
-    depends_on: [kafka]
+    depends_on: [ kafka ]
     ports:
       - 8083:8083
+    command:
+      - bash
+      - -c
+      - |
+        echo "Installing plugins ..."
+        confluent-hub install --no-prompt debezium/debezium-connector-postgresql:1.8.1
+        echo "Plugins installed"
+        /etc/confluent/docker/run &
+        sleep infinity
 
   schema-registry:
     image: confluentinc/cp-schema-registry:7.1.1
@@ -59,4 +68,4 @@ services:
       SCHEMA_REGISTRY_LISTENERS: http://0.0.0.0:8081
     ports:
       - 8081:8081
-    depends_on: [zookeeper, kafka]
+    depends_on: [ zookeeper, kafka ]

@@ -2,7 +2,7 @@
 curl -i -X POST -H "Content-Type:application/json" \
   http://localhost:8083/connectors/ \
   -d '{
-        "name": "source-debezium-shelters-00",
+        "name": "source-debezium-shelters-001",
         "config": {
             "connector.class": "io.debezium.connector.postgresql.PostgresConnector",
             "tasks.max": "1",
@@ -12,11 +12,12 @@ curl -i -X POST -H "Content-Type:application/json" \
             "database.password": "docker",
             "database.dbname" : "rescueme",
             "database.server.name": "pg-dev",
-            "schema.include.list": "public.(.*)",
+            "table.include.list": "public.shelter",
             "key.converter": "io.confluent.connect.avro.AvroConverter",
             "key.converter.schema.registry.url": "http://schema-registry:8081",
             "value.converter": "io.confluent.connect.avro.AvroConverter",
-            "value.converter.schema.registry.url": "http://schema-registry:8081"
+            "value.converter.schema.registry.url": "http://schema-registry:8081",
+            "slot.name" : "1"
             }
        }'
 
