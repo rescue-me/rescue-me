@@ -1,5 +1,6 @@
 package rescueme.com.app.domain.dog
 
+import cats.data.EitherT
 import cats.effect.IO
 import cats.implicits.catsSyntaxApplicativeId
 import org.mockito.Mockito.when
@@ -7,23 +8,38 @@ import org.scalatest.{EitherValues, OptionValues}
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
 import org.scalatestplus.mockito.MockitoSugar
-import rescueme.com.app.domain.DogNotFound
+import rescueme.com.app.domain.{DogNotFound, ShelterNotFound}
+import rescueme.com.app.domain.shelter.{Shelter, ShelterValidation}
 
-class DogServiceTest extends AnyFlatSpec with Matchers with MockitoSugar with EitherValues with OptionValues{
+import scala.util.Random
+
+class DogServiceTest extends AnyFlatSpec with Matchers with MockitoSugar with EitherValues with OptionValues {
 
   behavior of "dog service"
-
-  val dog: Dog                       = Dog("budy-test", "tester", "great testing")
-  val repo: DogRepositoryAlgebra[IO] = mock[DogRepositoryAlgebra[IO]]
-  val dogService: DogService[IO]     = DogService[IO](repo)
+  val shelter: Shelter                         = Shelter(Some(Random.nextLong), "test-name", "test-description")
+  val dog: Dog                                 = Dog("budy-test", "tester", "great testing", Random.nextLong)
+  val repo: DogRepositoryAlgebra[IO]           = mock[DogRepositoryAlgebra[IO]]
+  val shelterValidation: ShelterValidation[IO] = mock[ShelterValidation[IO]]
+  val dogService: DogService[IO]               = DogService[IO](repo, shelterValidation)
 
   it should "should create dog" in {
 
-    when(repo.create(dog)).thenReturn(IO(dog))
+    when(repo.create(dog)).thenReturn(IO.pure(dog))
+    when(shelterValidation.exists(dog.shelterId)).thenReturn(EitherT.pure(shelter))
 
     val result = dogService.create(dog).value.unsafeRunSync()
 
     result.value shouldBe dog
+
+  }
+
+  it should "should return left when creating dog with not found shelter" in {
+
+    when(shelterValidation.exists(dog.shelterId)).thenReturn(EitherT.leftT(ShelterNotFound))
+
+    val result = dogService.create(dog).value.unsafeRunSync()
+
+    result shouldBe Left(ShelterNotFound)
 
   }
 

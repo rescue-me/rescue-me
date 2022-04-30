@@ -2,17 +2,10 @@ package rescueme.com.app.infrastructure.repository.doobie
 
 import cats.effect.Async
 import doobie.implicits._
-import doobie.{Query0, Read, Transactor, Update0, Write}
+import doobie.{Query0, Transactor, Update0}
 import rescueme.com.app.domain.shelter.{Shelter, ShelterRepositoryAlgebra}
 
 object ShelterSql {
-
-  implicit val shelterRead: Read[Shelter] = Read[(Long, String, String)].map {
-    case (id, name, province) => Shelter(Some(id), name, province, List())
-  }
-  implicit val shelterWrite: Write[Shelter] = Write[(Long, String, String)].contramap { shelter =>
-    (shelter.id.get, shelter.name, shelter.province)
-  }
 
   def insert(shelter: Shelter): Update0 =
     sql"INSERT INTO shelter (name, province) VALUES (${shelter.name},${shelter.province})".update
@@ -22,6 +15,7 @@ object ShelterSql {
   def get(id: Long): Query0[Shelter] = sql"SELECT * FROM shelter where id=$id".query[Shelter]
 
 }
+
 class ShelterDoobieRepositoryAdapter[F[_]: Async](val xa: Transactor[F]) extends ShelterRepositoryAlgebra[F] {
 
   import ShelterSql._

@@ -10,6 +10,7 @@ import org.scalatest.{BeforeAndAfterAll, OptionValues}
 import rescueme.com.app.domain.dog.Dog
 
 import scala.concurrent.ExecutionContext
+import scala.util.Random
 
 class DogDoobieRepositoryAdapterTest extends AsyncFlatSpec with Matchers with BeforeAndAfterAll with OptionValues {
 
@@ -28,7 +29,14 @@ class DogDoobieRepositoryAdapterTest extends AsyncFlatSpec with Matchers with Be
       container.password
     )
     repository = DogDoobieRepositoryAdapter(transactor)
-    sql"CREATE TABLE dog(id serial NOT NULL,PRIMARY KEY (id),name character varying NOT NULL,breed character varying NOT NULL,description character varying NOT NULL)".update.run
+    sql"""
+         CREATE TABLE dog(
+             id serial NOT NULL,PRIMARY KEY (id),
+             name character varying NOT NULL,
+             breed character varying NOT NULL,
+             description character varying NOT NULL, 
+             shelter_id serial NOT NULL )
+             """.update.run
       .transact(transactor)
       .unsafeRunSync()
   }
@@ -46,7 +54,7 @@ class DogDoobieRepositoryAdapterTest extends AsyncFlatSpec with Matchers with Be
 
   it should "insert and retrieve dog" in {
 
-    val dog = Dog("budy-test", "tester", "testing doobie")
+    val dog = Dog("budy-test", "tester", "testing doobie", 1)
 
     (for {
       saved <- repository.create(dog)

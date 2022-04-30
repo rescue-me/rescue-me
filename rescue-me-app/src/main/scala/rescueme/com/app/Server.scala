@@ -9,7 +9,7 @@ import org.http4s.server.blaze.BlazeServerBuilder
 import org.http4s.server.{Router, Server => H4Server}
 import rescueme.com.app.config.{DatabaseConfig, RescuemeConfig}
 import rescueme.com.app.domain.dog.DogService
-import rescueme.com.app.domain.shelter.ShelterService
+import rescueme.com.app.domain.shelter.{ShelterService, ShelterValidationInterpreter}
 import rescueme.com.app.infrastructure.endpoint.{DogEndpoint, ShelterEndpoint}
 import rescueme.com.app.infrastructure.repository.doobie.{DogDoobieRepositoryAdapter, ShelterDoobieRepositoryAdapter}
 
@@ -22,10 +22,11 @@ object Server extends IOApp {
       txnEc    <- ExecutionContexts.cachedThreadPool[F]
       xa       <- DatabaseConfig.dbTransactor(conf.db, connEc, Blocker.liftExecutionContext(txnEc))
       serverEc <- ExecutionContexts.cachedThreadPool[F]
-      dogRepo        = DogDoobieRepositoryAdapter[F](xa)
-      dogService     = DogService(dogRepo)
-      shelterRepo    = ShelterDoobieRepositoryAdapter[F](xa)
-      shelterService = ShelterService[F](shelterRepo)
+      dogRepo           = DogDoobieRepositoryAdapter[F](xa)
+      shelterRepo       = ShelterDoobieRepositoryAdapter[F](xa)
+      shelterValidation = ShelterValidationInterpreter[F](shelterRepo)
+      dogService        = DogService(dogRepo, shelterValidation)
+      shelterService    = ShelterService[F](shelterRepo)
       httpApp = Router(
         "/api/dog"     -> DogEndpoint.endpoints(dogService),
         "/api/shelter" -> ShelterEndpoint.endpoints(shelterService)

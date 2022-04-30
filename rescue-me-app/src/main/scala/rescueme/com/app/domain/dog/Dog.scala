@@ -1,6 +1,9 @@
 package rescueme.com.app.domain.dog
 
-case class Dog(id: Option[Long] = None, name: String, breed: String, description: String)
+import rescueme.com.app.domain._
+
+case class Dog(id: Option[Identifier] = None, name: Name, breed: Breed, description: Description, shelterId: Identifier)
 object Dog {
-  def apply(name: String, breed: String, description: String) = new Dog(None, name, breed, description)
+  def apply(name: Name, breed: Breed, description: Description, shelterId: Identifier) =
+    new Dog(None, name, breed, description, shelterId)
 }

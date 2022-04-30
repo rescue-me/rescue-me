@@ -1,8 +1,6 @@
 -- Database
-CREATE
-DATABASE rescueme;
-\c
-rescueme;
+CREATE DATABASE rescueme;
+\c rescueme;
 
 CREATE TABLE shelter
 (
@@ -21,6 +19,8 @@ CREATE TABLE dog
     description character varying NOT NULL,
     shelter_id  serial            NOT NULL
 );
+
+CREATE INDEX dog_by_shelter_id ON dog (shelter_id);
 
 INSERT INTO shelter (name, province)
 VALUES ('Casa de acogida Madrid', 'Madrid'),
