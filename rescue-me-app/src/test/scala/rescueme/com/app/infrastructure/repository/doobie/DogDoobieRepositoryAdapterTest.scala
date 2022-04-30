@@ -1,12 +1,12 @@
 package rescueme.com.app.infrastructure.repository.doobie
 
 import cats.effect.{ContextShift, IO}
-import com.dimafeng.testcontainers.{Container, ForAllTestContainer, PostgreSQLContainer}
+import com.dimafeng.testcontainers.PostgreSQLContainer
 import doobie.implicits._
 import doobie.util.transactor.Transactor
-import org.scalatest.{BeforeAndAfterAll, OptionValues}
 import org.scalatest.flatspec.AsyncFlatSpec
 import org.scalatest.matchers.should.Matchers
+import org.scalatest.{BeforeAndAfterAll, OptionValues}
 import rescueme.com.app.domain.dog.Dog
 
 import scala.concurrent.ExecutionContext
@@ -39,7 +39,7 @@ class DogDoobieRepositoryAdapterTest extends AsyncFlatSpec with Matchers with Be
 
   behavior of "Doobie dog repository adapter"
 
-  it should "retrieve environments ok" in {
+  it should "retrieve dogs ok" in {
 
     repository.all().unsafeRunSync().size shouldBe 0
   }
