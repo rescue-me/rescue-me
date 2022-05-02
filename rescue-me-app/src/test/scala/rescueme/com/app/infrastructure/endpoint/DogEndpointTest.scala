@@ -19,6 +19,8 @@ import rescueme.com.app.domain.dog.{Dog, DogRepositoryAlgebra, DogService}
 import rescueme.com.app.domain.shelter.{ShelterValidation, ShelterValidationInterpreter}
 import rescueme.com.app.infrastructure.repository.{DogStubRepository, ShelterStubRepository}
 
+import java.util.UUID
+
 class DogEndpointTest
     extends AnyFunSuite
     with Matchers
@@ -65,5 +67,15 @@ class DogEndpointTest
         body shouldBe createdDog
       }).unsafeRunSync()
     }
+  }
+
+  test("Should retrieve by shelter") {
+    (for {
+      req      <- GET(Uri.unsafeFromString(s"/dogs?shelter=${UUID.randomUUID()}"))
+      res      <- router.run(req)
+      response <- res.as[List[Dog]]
+    } yield {
+      response.size should be > 0
+    }).unsafeRunSync()
   }
 }

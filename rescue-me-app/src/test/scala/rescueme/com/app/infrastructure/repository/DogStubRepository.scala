@@ -8,8 +8,9 @@ import java.util.UUID
 
 object DogStubRepository extends DogRepositoryAlgebra[IO] {
 
-  private val dog: Dog                              = Dog(Some(UUID.randomUUID()), "dog-test", "breed-test", "black", UUID.randomUUID())
-  override def all(): IO[List[Dog]]                 = IO.pure(List(dog))
-  override def create(req: Dog): IO[Dog]            = IO.pure(dog)
-  override def get(id: Identifier): IO[Option[Dog]] = IO.pure(Some(dog))
+  private val dog: Dog                                            = Dog(Some(UUID.randomUUID()), "dog-test", "breed-test", "black", UUID.randomUUID())
+  override def all(): IO[List[Dog]]                               = IO.pure(List(dog))
+  override def create(req: Dog): IO[Dog]                          = IO.pure(dog)
+  override def get(id: Identifier): IO[Option[Dog]]               = IO.pure(Some(dog))
+  override def getByShelter(shelterId: Identifier): IO[List[Dog]] = IO.pure(List(dog))
 }

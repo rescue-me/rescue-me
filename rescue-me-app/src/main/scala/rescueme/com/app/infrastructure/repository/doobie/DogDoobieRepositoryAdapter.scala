@@ -25,6 +25,8 @@ object DogSql {
   def getAll: Query0[Dog] = sql"SELECT * FROM dog".query[Dog]
 
   def get(id: Identifier): Query0[Dog] = sql"SELECT * FROM dog where id=$id".query[Dog]
+
+  def getByShelterId(id: Identifier): Query0[Dog] = sql"SELECT * FROM dog where shelter_id=$id".query[Dog]
 }
 
 class DogDoobieRepositoryAdapter[F[_]: Async](val xa: Transactor[F]) extends DogRepositoryAlgebra[F] {
@@ -38,6 +40,9 @@ class DogDoobieRepositoryAdapter[F[_]: Async](val xa: Transactor[F]) extends Dog
       .withUniqueGeneratedKeys[UUID]("id")
       .map(id => dog.copy(id = Some(id)))
       .transact(xa)
+
+  override def getByShelter(shelterId: Identifier): F[List[Dog]] =
+    DogSql.getByShelterId(shelterId).stream.compile.toList.transact(xa)
 }
 
 object DogDoobieRepositoryAdapter {

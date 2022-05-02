@@ -6,4 +6,5 @@ trait DogRepositoryAlgebra[F[_]] {
   def all(): F[List[Dog]]
   def create(dog: Dog): F[Dog]
   def get(id: Identifier): F[Option[Dog]]
+  def getByShelter(shelterId: Identifier): F[List[Dog]]
 }

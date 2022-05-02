@@ -17,6 +17,8 @@ class DogService[F[_]: Monad](repository: DogRepositoryAlgebra[F], shelterValida
 
   def get(id: Identifier): EitherT[F, DogNotFound.type, Dog] = EitherT.fromOptionF(repository.get(id), DogNotFound)
 
+  def getByShelter(shelterId: Identifier): F[List[Dog]] = repository.getByShelter(shelterId)
+
 }
 
 object DogService {

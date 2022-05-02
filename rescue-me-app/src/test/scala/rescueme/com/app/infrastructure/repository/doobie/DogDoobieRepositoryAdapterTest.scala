@@ -67,4 +67,17 @@ class DogDoobieRepositoryAdapterTest extends AsyncFlatSpec with Matchers with Be
 
   }
 
+  it should "retrieve by shelter id ok" in {
+    val uuid = UUID.randomUUID()
+    val dog  = Dog("budy-test", "tester", "testing doobie", uuid)
+
+    (for {
+      saved <- repository.create(dog)
+      all   <- repository.getByShelter(uuid)
+    } yield {
+      all should contain(saved)
+    }).unsafeRunSync()
+
+  }
+
 }

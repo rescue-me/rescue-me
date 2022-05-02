@@ -52,6 +52,16 @@ class DogServiceTest extends AnyFlatSpec with Matchers with MockitoSugar with Ei
     retrieved shouldBe List(dog)
   }
 
+  it should "retrieve all dogs by shelter" in {
+
+    val shelter = UUID.randomUUID()
+    when(repo.getByShelter(shelter)).thenReturn(IO(List(dog)))
+
+    val retrieved: List[Dog] = dogService.getByShelter(shelter).unsafeRunSync()
+
+    retrieved shouldBe List(dog)
+  }
+
   it should "retrieve dog by id" in {
     val id = UUID.randomUUID()
     when(repo.get(id)).thenReturn(Some(dog).pure[IO])

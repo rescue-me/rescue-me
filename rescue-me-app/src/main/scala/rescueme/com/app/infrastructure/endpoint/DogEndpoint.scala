@@ -6,15 +6,25 @@ import io.circe.generic.auto._
 import io.circe.syntax._
 import org.http4s.circe._
 import org.http4s.dsl.Http4sDsl
-import org.http4s.{EntityDecoder, HttpRoutes}
+import org.http4s.{EntityDecoder, HttpRoutes, QueryParam, QueryParamDecoder}
 import rescueme.com.app.domain.dog.{Dog, DogService}
+
+import java.util.UUID
 
 class DogEndpoint[F[_]: Sync] extends Http4sDsl[F] {
 
-  implicit val dogDecoder: EntityDecoder[F, Dog] = jsonOf
+  implicit val dogDecoder: EntityDecoder[F, Dog]                   = jsonOf
+  implicit val shelterIdQueryParamDecoder: QueryParamDecoder[UUID] = QueryParamDecoder[String].map(UUID.fromString)
+  object ShelterFilterQueryParamMatcher extends QueryParamDecoderMatcher[UUID]("shelter")
 
-  private def findAllDogs(dogService: DogService[F]): HttpRoutes[F] =
+  private def findDogs(dogService: DogService[F]): HttpRoutes[F] =
     HttpRoutes.of[F] {
+      case GET -> Root :? ShelterFilterQueryParamMatcher(shelter) =>
+        for {
+          all  <- dogService.getByShelter(shelter)
+          resp <- Ok(all.asJson)
+        } yield resp
+
       case GET -> Root =>
         for {
           retrieved <- dogService.all()
@@ -51,7 +61,7 @@ class DogEndpoint[F[_]: Sync] extends Http4sDsl[F] {
   }
 
   def endpoints(dogService: DogService[F]): HttpRoutes[F] =
-    findAllDogs(dogService) <+>
+    findDogs(dogService) <+>
       createDog(dogService) <+>
       get(dogService)
 }
