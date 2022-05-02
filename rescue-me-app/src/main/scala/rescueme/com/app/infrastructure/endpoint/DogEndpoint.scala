@@ -28,7 +28,6 @@ class DogEndpoint[F[_]: Sync] extends Http4sDsl[F] {
       case GET -> Root =>
         for {
           retrieved <- dogService.all()
-          _         <- println(s"retrieved dogs: $retrieved").pure[F]
           resp <- Ok(retrieved.asJson).handleErrorWith { thr =>
             println(s"Error occurred $thr")
             InternalServerError()
