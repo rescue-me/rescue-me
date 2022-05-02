@@ -50,9 +50,7 @@ class DogEndpoint[F[_]: Sync] extends Http4sDsl[F] {
     }
   }
 
-  def endpoints(
-      dogService: DogService[F]
-  ): HttpRoutes[F] =
+  def endpoints(dogService: DogService[F]): HttpRoutes[F] =
     findAllDogs(dogService) <+>
       createDog(dogService) <+>
       get(dogService)

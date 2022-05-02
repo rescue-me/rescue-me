@@ -1,2 +1,2 @@
 #!/usr/bin/env bash
-kcat -b localhost:9092 -t pg-dev.public.dog -s value=avro -r http://localhost:8081
+docker run --tty --network rescue-me-app_default confluentinc/cp-kafkacat kafkacat -b kafka:9092 -C -s key=s -s value=avro -r http://schema-registry:8081 -t pg-dev.public.dog
