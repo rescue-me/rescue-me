@@ -27,7 +27,7 @@ class ShelterDoobieRepositoryAdapterTest extends AsyncFlatSpec with Matchers wit
       container.username,
       container.password
     )
-    sql"CREATE TABLE shelter(id serial NOT NULL,PRIMARY KEY (id),name character varying NOT NULL,province character varying NOT NULL)".update.run
+    sql"CREATE TABLE shelter(id uuid NOT NULL,PRIMARY KEY (id),name character varying NOT NULL,province character varying NOT NULL)".update.run
       .transact(transactor)
       .unsafeRunSync()
     repository = ShelterDoobieRepositoryAdapter(transactor)

@@ -1,9 +1,10 @@
 package rescueme.com.app
 
+import org.scalacheck.Arbitrary
 import org.scalacheck.Arbitrary.arbitrary
-import org.scalacheck.{Arbitrary, Gen}
 import rescueme.com.app.domain.dog.Dog
-import rescueme.com.app.domain.shelter.Shelter
+
+import java.util.UUID
 
 trait Arbitraries {
 
@@ -12,8 +13,6 @@ trait Arbitraries {
       name        <- arbitrary[String]
       breed       <- arbitrary[String]
       description <- arbitrary[String]
-      id          <- Gen.option(Gen.long)
-      shelterId   <- arbitrary[Long]
-    } yield Dog(id, name, breed, description, shelterId)
+    } yield Dog(Some(UUID.randomUUID()), name, breed, description, UUID.randomUUID())
   }
 }

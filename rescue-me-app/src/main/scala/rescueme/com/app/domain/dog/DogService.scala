@@ -2,7 +2,7 @@ package rescueme.com.app.domain.dog
 
 import cats.Monad
 import cats.data.EitherT
-import rescueme.com.app.domain.{DogNotFound, DomainError}
+import rescueme.com.app.domain.{DogNotFound, DomainError, Identifier}
 import rescueme.com.app.domain.shelter.ShelterValidation
 
 class DogService[F[_]: Monad](repository: DogRepositoryAlgebra[F], shelterValidation: ShelterValidation[F]) {
@@ -15,7 +15,7 @@ class DogService[F[_]: Monad](repository: DogRepositoryAlgebra[F], shelterValida
       created <- EitherT.liftF(repository.create(dog))
     } yield created
 
-  def get(id: Long): EitherT[F, DogNotFound.type, Dog] = EitherT.fromOptionF(repository.get(id), DogNotFound)
+  def get(id: Identifier): EitherT[F, DogNotFound.type, Dog] = EitherT.fromOptionF(repository.get(id), DogNotFound)
 
 }
 

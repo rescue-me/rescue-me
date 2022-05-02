@@ -9,8 +9,8 @@ import org.scalatest.matchers.should.Matchers
 import org.scalatest.{BeforeAndAfterAll, OptionValues}
 import rescueme.com.app.domain.dog.Dog
 
+import java.util.UUID
 import scala.concurrent.ExecutionContext
-import scala.util.Random
 
 class DogDoobieRepositoryAdapterTest extends AsyncFlatSpec with Matchers with BeforeAndAfterAll with OptionValues {
 
@@ -31,11 +31,11 @@ class DogDoobieRepositoryAdapterTest extends AsyncFlatSpec with Matchers with Be
     repository = DogDoobieRepositoryAdapter(transactor)
     sql"""
          CREATE TABLE dog(
-             id serial NOT NULL,PRIMARY KEY (id),
+             id uuid NOT NULL,PRIMARY KEY (id),
              name character varying NOT NULL,
              breed character varying NOT NULL,
              description character varying NOT NULL, 
-             shelter_id serial NOT NULL )
+             shelter_id uuid NOT NULL )
              """.update.run
       .transact(transactor)
       .unsafeRunSync()
@@ -54,7 +54,7 @@ class DogDoobieRepositoryAdapterTest extends AsyncFlatSpec with Matchers with Be
 
   it should "insert and retrieve dog" in {
 
-    val dog = Dog("budy-test", "tester", "testing doobie", 1)
+    val dog = Dog("budy-test", "tester", "testing doobie", UUID.randomUUID())
 
     (for {
       saved <- repository.create(dog)

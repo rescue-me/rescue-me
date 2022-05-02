@@ -8,6 +8,8 @@ import org.scalatest.matchers.should.Matchers
 import org.scalatestplus.mockito.MockitoSugar
 import rescueme.com.app.domain.ShelterNotFound
 
+import java.util.UUID
+
 class ShelterServiceTest extends AnyFlatSpec with Matchers with MockitoSugar with EitherValues with OptionValues {
 
   behavior of "shelter service"
@@ -33,7 +35,7 @@ class ShelterServiceTest extends AnyFlatSpec with Matchers with MockitoSugar wit
 
   it should "retrieve shelter by id ok" in {
 
-    val id = 1L
+    val id = UUID.randomUUID()
     when(repositoryAlgebra.get(id)).thenReturn(IO.pure(Some(shelter)))
 
     val result = shelterService.get(id).value.unsafeRunSync()
@@ -43,7 +45,7 @@ class ShelterServiceTest extends AnyFlatSpec with Matchers with MockitoSugar wit
 
   it should "return left when shelter not found" in {
 
-    val id = 1L
+    val id = UUID.randomUUID()
     when(repositoryAlgebra.get(id)).thenReturn(IO.pure(None))
 
     val result = shelterService.get(id).value.unsafeRunSync()

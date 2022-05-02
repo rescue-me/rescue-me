@@ -11,13 +11,14 @@ import org.scalatestplus.mockito.MockitoSugar
 import rescueme.com.app.domain.{DogNotFound, ShelterNotFound}
 import rescueme.com.app.domain.shelter.{Shelter, ShelterValidation}
 
+import java.util.UUID
 import scala.util.Random
 
 class DogServiceTest extends AnyFlatSpec with Matchers with MockitoSugar with EitherValues with OptionValues {
 
   behavior of "dog service"
-  val shelter: Shelter                         = Shelter(Some(Random.nextLong), "test-name", "test-description")
-  val dog: Dog                                 = Dog("budy-test", "tester", "great testing", Random.nextLong)
+  val shelter: Shelter                         = Shelter(Some(UUID.randomUUID()), "test-name", "test-description")
+  val dog: Dog                                 = Dog("budy-test", "tester", "great testing", UUID.randomUUID())
   val repo: DogRepositoryAlgebra[IO]           = mock[DogRepositoryAlgebra[IO]]
   val shelterValidation: ShelterValidation[IO] = mock[ShelterValidation[IO]]
   val dogService: DogService[IO]               = DogService[IO](repo, shelterValidation)
@@ -52,7 +53,7 @@ class DogServiceTest extends AnyFlatSpec with Matchers with MockitoSugar with Ei
   }
 
   it should "retrieve dog by id" in {
-    val id = 1L
+    val id = UUID.randomUUID()
     when(repo.get(id)).thenReturn(Some(dog).pure[IO])
 
     val retrieved = dogService.get(id).value.unsafeRunSync()
@@ -62,7 +63,7 @@ class DogServiceTest extends AnyFlatSpec with Matchers with MockitoSugar with Ei
 
   it should "return left with error when dog is not found" in {
 
-    val id = 1L
+    val id = UUID.randomUUID()
     when(repo.get(id)).thenReturn(None.pure[IO])
 
     val retrieved = dogService.get(id).value.unsafeRunSync()

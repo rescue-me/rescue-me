@@ -38,7 +38,7 @@ class ShelterEndpoint[F[_]: Sync] extends Http4sDsl[F] {
 
   private def get(shelterService: ShelterService[F]): HttpRoutes[F] = {
     HttpRoutes.of[F] {
-      case GET -> Root / LongVar(id) =>
+      case GET -> Root / UUIDVar(id) =>
         shelterService.get(id).value flatMap {
           case Left(_)        => BadRequest(s"Shelter with id: $id not found")
           case Right(shelter) => Ok(shelter.asJson)

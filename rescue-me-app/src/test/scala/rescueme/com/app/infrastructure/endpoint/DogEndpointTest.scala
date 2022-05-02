@@ -15,10 +15,9 @@ import org.scalatest.matchers.must.Matchers
 import org.scalatest.matchers.should.Matchers.convertToAnyShouldWrapper
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
 import rescueme.com.app.Arbitraries
-import rescueme.com.app.domain.dog.{Dog, DogService}
+import rescueme.com.app.domain.dog.{Dog, DogRepositoryAlgebra, DogService}
 import rescueme.com.app.domain.shelter.{ShelterValidation, ShelterValidationInterpreter}
-import rescueme.com.app.infrastructure.repository.ShelterStubRepository
-import rescueme.com.app.infrastructure.repository.inmemory.DogRepositoryInMemoryInterpreter
+import rescueme.com.app.infrastructure.repository.{DogStubRepository, ShelterStubRepository}
 
 class DogEndpointTest
     extends AnyFunSuite
@@ -31,7 +30,7 @@ class DogEndpointTest
 
   implicit val entityDecoder: EntityDecoder[IO, Dog] = jsonOf[IO, Dog]
   implicit val entityEncoder: EntityEncoder[IO, Dog] = jsonEncoderOf[IO, Dog]
-  val dogRepo: DogRepositoryInMemoryInterpreter[IO]  = DogRepositoryInMemoryInterpreter[IO]
+  val dogRepo: DogRepositoryAlgebra[IO]              = DogStubRepository
   val shelterValidation: ShelterValidation[IO]       = ShelterValidationInterpreter[IO](ShelterStubRepository)
   val dogService: DogService[IO]                     = DogService(dogRepo, shelterValidation)
   val router: HttpApp[IO]                            = Router("/dogs" -> DogEndpoint.endpoints[IO](dogService)).orNotFound

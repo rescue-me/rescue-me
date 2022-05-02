@@ -20,7 +20,7 @@ class DogEndpoint[F[_]: Sync] extends Http4sDsl[F] {
           retrieved <- dogService.all()
           _         <- println(s"retrieved dogs: $retrieved").pure[F]
           resp <- Ok(retrieved.asJson).handleErrorWith { thr =>
-            println(s"Error occured $thr")
+            println(s"Error occurred $thr")
             InternalServerError()
           }
         } yield resp
@@ -42,7 +42,7 @@ class DogEndpoint[F[_]: Sync] extends Http4sDsl[F] {
 
   private def get(dogService: DogService[F]): HttpRoutes[F] = {
     HttpRoutes.of[F] {
-      case GET -> Root / LongVar(id) =>
+      case GET -> Root / UUIDVar(id) =>
         dogService.get(id).value flatMap {
           case Left(_)    => BadRequest(s"Dog with id: $id not found")
           case Right(dog) => Ok(dog.asJson)
