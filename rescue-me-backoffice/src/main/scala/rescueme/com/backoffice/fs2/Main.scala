@@ -1,10 +1,9 @@
-package rescueme.com.backoffice
+package rescueme.com.backoffice.fs2
 
 import cats.effect.{IO, IOApp}
 import fs2.kafka._
 
-import java.util.UUID
-import scala.concurrent.duration._
+import scala.concurrent.duration.DurationInt
 import scala.util.Random
 
 object Main extends IOApp.Simple {

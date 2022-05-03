@@ -2,17 +2,17 @@
 curl -i -X POST -H "Content-Type:application/json" \
   http://localhost:8083/connectors/ \
   -d '{
-        "name": "source-debezium-shelters",
+        "name": "rescueme-jdbc-source",
         "config": {
-            "connector.class": "io.debezium.connector.postgresql.PostgresConnector",
+            "connector.class": "io.confluent.connect.jdbc.JdbcSourceConnector",
             "tasks.max": "1",
-            "database.hostname": "postgres",
-            "database.port": "5432",
-            "database.user": "docker",
-            "database.password": "docker",
-            "database.dbname" : "rescueme",
-            "database.server.name": "pg-dev",
-            "table.include.list": "public.shelter",
+            "connection.url": "jdbc:postgresql://postgres:5432/rescueme",
+            "connection.user": "docker",
+            "connection.password": "docker",
+            "table.whitelist": "public.shelter",
+            "topic.prefix": "",
+            "name": "rescueme-jdbc-source",
+            "mode": "bulk",
             "key.converter": "org.apache.kafka.connect.storage.StringConverter",
             "value.converter": "org.apache.kafka.connect.json.JsonConverter",
             "value.converter.schemas.enable": "false",

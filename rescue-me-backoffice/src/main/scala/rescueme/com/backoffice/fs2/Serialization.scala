@@ -1,10 +1,10 @@
-package rescueme.com.backoffice
+package rescueme.com.backoffice.fs2
 
 import cats.effect.IO
-import cats.syntax.all._
 import fs2.kafka.vulcan.{avroDeserializer, avroSerializer, AvroSettings, SchemaRegistryClientSettings}
 import fs2.kafka.{RecordDeserializer, RecordSerializer}
 import vulcan.Codec
+import cats.syntax.all._
 
 object Serialization {
 

@@ -14,8 +14,7 @@ curl -i -X POST -H "Content-Type:application/json" \
             "database.server.name": "pg-dev",
             "table.include.list": "public.dog",
             "key.converter": "org.apache.kafka.connect.storage.StringConverter",
-            "value.converter": "io.confluent.connect.avro.AvroConverter",
-            "value.converter.schema.registry.url": "http://schema-registry:8081",
+            "value.converter": "org.apache.kafka.connect.json.JsonConverter",
             "value.converter.schemas.enable": "false",
             "slot.name" : "1"
             }
