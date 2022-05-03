@@ -1,2 +1,0 @@
-#!/usr/bin/env bash
-docker run --tty --network rescue-me-app_default confluentinc/cp-kafkacat kafkacat -b -broker:29092 -C -s key=avro -s value=avro -r http://schema-registry:8081 -t pg-dev.public.shelter

@@ -2,22 +2,32 @@ package rescueme.com.backoffice
 
 import cats.effect.{IO, IOApp}
 import fs2.kafka._
+
+import java.util.UUID
 import scala.concurrent.duration._
+import scala.util.Random
 
 object Main extends IOApp.Simple {
 
   override def run: IO[Unit] = {
-    def processRecord(record: ConsumerRecord[String, String]): IO[(String, String)] =
-      IO.println(s"processing record $record") *> IO.pure(record.key -> record.value)
+
+    import Serialization._
+
+    def processRecord(record: ConsumerRecord[String, String]): IO[(String, ShelterComputed)] =
+      IO.println(s"processing record $record ...") *> IO {
+        val value = record.value
+        println(value)
+        (record.key, ShelterComputed(Random.nextLong(), "testing-app", "Complex computation"))
+      } <* IO.println("Record processed!")
 
     val consumerSettings =
       ConsumerSettings[IO, String, String]
         .withAutoOffsetReset(AutoOffsetReset.Earliest)
         .withBootstrapServers("localhost:9092")
-        .withGroupId("rescueme-backoffice")
+        .withGroupId("rescueme-backoffice-001")
 
     val producerSettings =
-      ProducerSettings[IO, String, String]
+      ProducerSettings[IO, String, ShelterComputed]
         .withBootstrapServers("localhost:9092")
 
     val stream =
