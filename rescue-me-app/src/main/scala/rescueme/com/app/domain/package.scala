@@ -8,5 +8,6 @@ package object domain {
   type Breed       = String
   type Identifier  = UUID
   type Description = String
+  type Tag         = String
 
 }
