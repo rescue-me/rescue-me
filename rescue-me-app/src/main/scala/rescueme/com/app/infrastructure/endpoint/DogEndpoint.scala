@@ -7,7 +7,7 @@ import io.circe.syntax._
 import org.http4s.circe._
 import org.http4s.dsl.Http4sDsl
 import org.http4s.{EntityDecoder, HttpRoutes, QueryParam, QueryParamDecoder}
-import rescueme.com.app.domain.dog.{Dog, DogService}
+import rescueme.com.app.domain.dog.{Dog, DogDetailService, DogService}
 
 import java.util.UUID
 
@@ -59,14 +59,18 @@ class DogEndpoint[F[_]: Sync] extends Http4sDsl[F] {
     }
   }
 
-  def endpoints(dogService: DogService[F]): HttpRoutes[F] =
+  private def details(dogDetailsService: DogDetailService[F]): HttpRoutes[F] = ???
+
+  def endpoints(dogService: DogService[F], dogDetailsService: DogDetailService[F]): HttpRoutes[F] =
     findDogs(dogService) <+>
       createDog(dogService) <+>
-      get(dogService)
+      get(dogService) <+>
+      details(dogDetailsService)
 }
 
 object DogEndpoint {
   def endpoints[F[_]: Sync](
-      dogService: DogService[F]
-  ): HttpRoutes[F] = new DogEndpoint[F].endpoints(dogService)
+      dogService: DogService[F],
+      dogDetailsService: DogDetailService[F]
+  ): HttpRoutes[F] = new DogEndpoint[F].endpoints(dogService, dogDetailsService)
 }
