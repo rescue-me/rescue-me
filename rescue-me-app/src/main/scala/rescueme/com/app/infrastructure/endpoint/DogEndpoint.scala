@@ -1,19 +1,25 @@
 package rescueme.com.app.infrastructure.endpoint
 
+import cats.data.{EitherT, Validated}
 import cats.effect.Sync
 import cats.syntax.all._
 import io.circe.generic.auto._
 import io.circe.syntax._
 import org.http4s.circe._
 import org.http4s.dsl.Http4sDsl
-import org.http4s.{EntityDecoder, HttpRoutes, QueryParam, QueryParamDecoder}
-import rescueme.com.app.domain.dog.{Dog, DogDetailService, DogService}
+import org.http4s.{EntityDecoder, HttpRoutes, QueryParamDecoder}
+import rescueme.com.app.domain.{DogNotFound, DomainError}
+import rescueme.com.app.domain.dog.{Dog, DogDetail, DogDetailService, DogService}
 
 import java.util.UUID
 
-class DogEndpoint[F[_]: Sync] extends Http4sDsl[F] {
+class DogEndpoint[F[_]: Sync] {
+
+  implicit val dsl = Http4sDsl.apply[F]
+  import dsl._
 
   implicit val dogDecoder: EntityDecoder[F, Dog]                   = jsonOf
+  implicit val dogDetailsDecoder: EntityDecoder[F, DogDetail]      = jsonOf
   implicit val shelterIdQueryParamDecoder: QueryParamDecoder[UUID] = QueryParamDecoder[String].map(UUID.fromString)
   object ShelterFilterQueryParamMatcher extends QueryParamDecoderMatcher[UUID]("shelter")
 
@@ -59,7 +65,27 @@ class DogEndpoint[F[_]: Sync] extends Http4sDsl[F] {
     }
   }
 
-  private def details(dogDetailsService: DogDetailService[F]): HttpRoutes[F] = ???
+  private def details(dogDetailsService: DogDetailService[F]): HttpRoutes[F] = {
+    HttpRoutes.of[F] {
+      case GET -> Root / UUIDVar(id) / "details" => {
+        dogDetailsService.get(id).value flatMap {
+          case Left(_)        => BadRequest(s"Dog with id: $id not found")
+          case Right(details) => Ok(details.asJson)
+        }
+      }
+      case req @ POST -> Root / UUIDVar(id) / "details" => {
+        for {
+          dogDetails <- req.as[DogDetail]
+          created <- withValidation(sameId(id, dogDetails)) { valid =>
+            dogDetailsService.create(valid).value match {
+              case Left           => InternalServerError()
+              case Right(created) => Ok(created.asJson)
+            }
+          }
+        } yield created
+      }
+    }
+  }
 
   def endpoints(dogService: DogService[F], dogDetailsService: DogDetailService[F]): HttpRoutes[F] =
     findDogs(dogService) <+>
