@@ -1,6 +1,5 @@
 package rescueme.com.app.infrastructure.endpoint
 
-import cats.data.{EitherT, Validated}
 import cats.effect.Sync
 import cats.syntax.all._
 import io.circe.generic.auto._
@@ -8,7 +7,6 @@ import io.circe.syntax._
 import org.http4s.circe._
 import org.http4s.dsl.Http4sDsl
 import org.http4s.{EntityDecoder, HttpRoutes, QueryParamDecoder}
-import rescueme.com.app.domain.{DogNotFound, DomainError}
 import rescueme.com.app.domain.dog.{Dog, DogDetail, DogDetailService, DogService}
 
 import java.util.UUID
@@ -78,6 +76,17 @@ class DogEndpoint[F[_]: Sync] {
           dogDetails <- req.as[DogDetail]
           created <- withValidation(sameId(id, dogDetails)) { valid =>
             dogDetailsService.create(valid).value match {
+              case Left           => InternalServerError()
+              case Right(created) => Ok(created.asJson)
+            }
+          }
+        } yield created
+      }
+      case req @ PUT -> Root / UUIDVar(id) / "details" => {
+        for {
+          dogDetails <- req.as[DogDetail]
+          created <- withValidation(sameId(id, dogDetails)) { valid =>
+            dogDetailsService.update(valid).value match {
               case Left           => InternalServerError()
               case Right(created) => Ok(created.asJson)
             }
