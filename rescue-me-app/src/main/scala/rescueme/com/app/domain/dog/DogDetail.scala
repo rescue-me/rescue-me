@@ -5,25 +5,27 @@ import rescueme.com.app.domain._
 import java.util.{Date, UUID}
 
 case class DogDetail(
-    dogId: UUID,
+    dogId: Identifier,
     name: Name,
     breed: Breed,
     color: String,
     description: Description,
-    gender: Gender,
-    size: Size,
+    gender: String,
+    size: String,
     dateOfBirth: Option[Date] = None,
     since: Option[Date] = None
 )
 object DogDetail {
   def apply(
-      dogId: UUID,
+      dogId: Identifier,
       name: Name,
       breed: Breed,
       color: String,
       description: Description,
-      gender: Gender,
-      size: Size
+      gender: String,
+      size: String,
+      dateOfBirth: Option[Date] = None,
+      since: Option[Date] = None
   ) =
     new DogDetail(dogId = dogId,
                   name = name,
@@ -32,6 +34,6 @@ object DogDetail {
                   description = description,
                   gender = gender,
                   size = size,
-                  dateOfBirth = None,
-                  since = None)
+                  dateOfBirth,
+                  since)
 }

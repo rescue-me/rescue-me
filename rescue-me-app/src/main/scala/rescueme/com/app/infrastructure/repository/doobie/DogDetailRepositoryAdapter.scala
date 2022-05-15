@@ -4,6 +4,8 @@ import cats.data.OptionT
 import cats.effect.Async
 import doobie._
 import doobie.implicits._
+
+import doobie.postgres.implicits._
 import rescueme.com.app.domain.dog.{DogDetail, DogDetailRepositoryAlgebra}
 import rescueme.com.app.domain._
 
@@ -14,7 +16,7 @@ object Q {
 
   def get(id: Identifier): doobie.Query0[DogDetail] =
     sql"""
-      SELECT * FROM dog_details WHERE id = ${id.toString}
+      SELECT * FROM dog_details WHERE id = $id
        """.query[DogDetail]
 
   def update(dogDetail: DogDetail): doobie.Update0 = ???

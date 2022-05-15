@@ -27,7 +27,7 @@ object DogDetailService {
       override def create(dogDetail: DogDetail): EitherT[F, DogDetailsAlreadyExists.type, DogDetail] =
         for {
           _ <- EitherT {
-            dogRepository.getDetails(dogDetail.dogId) flatMap {
+            dogRepository.getDetails(dogDetail.dogId) flatMap  {
               case Some(_) => Either.left[DogDetailsAlreadyExists.type, Unit](DogDetailsAlreadyExists).pure[F]
               case None    => Either.right[DogDetailsAlreadyExists.type, Unit](()).pure[F]
             }

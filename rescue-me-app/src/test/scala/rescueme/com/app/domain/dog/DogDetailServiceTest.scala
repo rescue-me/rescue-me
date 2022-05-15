@@ -19,8 +19,8 @@ class DogDetailServiceTest extends AnyFlatSpec with Matchers with MockitoSugar w
   val repo: DogDetailRepositoryAlgebra[IO]   = mock[DogDetailRepositoryAlgebra[IO]]
   val validator: DogValidatorInterpreter[IO] = mock[DogValidatorInterpreter[IO]]
   val service: DogDetailService[IO]          = DogDetailService.make[IO](repo, validator)
-  val details: DogDetail =
-    DogDetail(UUID.randomUUID(), "name-test", "bulldog", "brown", "great dog good temper", Male, Small)
+  val details: DogDetail = ???
+   // DogDetail(UUID.randomUUID(), "name-test", "bulldog", "brown", "great dog good temper", Male, Small)
 
   it should "create new details ok" in {
 
