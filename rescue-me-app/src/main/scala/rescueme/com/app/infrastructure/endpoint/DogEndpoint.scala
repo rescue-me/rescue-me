@@ -4,6 +4,8 @@ import cats.effect.Sync
 import cats.syntax.all._
 import io.circe.generic.auto._
 import io.circe.syntax._
+import org.http4s._
+import org.http4s.circe.CirceEntityCodec._
 import org.http4s.circe._
 import org.http4s.dsl.Http4sDsl
 import org.http4s.{EntityDecoder, HttpRoutes, QueryParamDecoder}
@@ -16,8 +18,6 @@ class DogEndpoint[F[_]: Sync] {
   implicit val dsl = Http4sDsl.apply[F]
   import dsl._
 
-  implicit val dogDecoder: EntityDecoder[F, Dog]                   = jsonOf
-  implicit val dogDetailsDecoder: EntityDecoder[F, DogDetail]      = jsonOf
   implicit val shelterIdQueryParamDecoder: QueryParamDecoder[UUID] = QueryParamDecoder[String].map(UUID.fromString)
   object ShelterFilterQueryParamMatcher extends QueryParamDecoderMatcher[UUID]("shelter")
 
@@ -26,7 +26,7 @@ class DogEndpoint[F[_]: Sync] {
       case GET -> Root :? ShelterFilterQueryParamMatcher(shelter) =>
         for {
           all  <- dogService.getByShelter(shelter)
-          resp <- Ok(all.asJson)
+          resp <- Ok(all)
         } yield resp
 
       case GET -> Root =>
@@ -47,7 +47,7 @@ class DogEndpoint[F[_]: Sync] {
           res <- dogService.create(dog).value
         } yield res
         result.flatMap {
-          case Right(dogCreated) => Ok(dogCreated.asJson)
+          case Right(dogCreated) => Ok(dogCreated)
           case Left(_)           => Conflict(s"A dog with these fields already exists")
         }
     }
@@ -58,7 +58,7 @@ class DogEndpoint[F[_]: Sync] {
       case GET -> Root / UUIDVar(id) =>
         dogService.get(id).value flatMap {
           case Left(_)    => BadRequest(s"Dog with id: $id not found")
-          case Right(dog) => Ok(dog.asJson)
+          case Right(dog) => Ok(dog)
         }
     }
   }
@@ -68,7 +68,7 @@ class DogEndpoint[F[_]: Sync] {
       case GET -> Root / UUIDVar(id) / "details" => {
         dogDetailsService.get(id).value flatMap {
           case Left(_)        => BadRequest(s"Dog with id: $id not found")
-          case Right(details) => Ok(details.asJson)
+          case Right(details) => Ok(details)
         }
       }
       case req @ POST -> Root / UUIDVar(id) / "details" => {
@@ -77,7 +77,7 @@ class DogEndpoint[F[_]: Sync] {
           created <- withValidation(sameId(id, dogDetails)) { valid =>
             dogDetailsService.create(valid).value match {
               case Left           => InternalServerError()
-              case Right(created) => Ok(created.asJson)
+              case Right(created) => Ok(created)
             }
           }
         } yield created
@@ -88,7 +88,7 @@ class DogEndpoint[F[_]: Sync] {
           created <- withValidation(sameId(id, dogDetails)) { valid =>
             dogDetailsService.update(valid).value match {
               case Left           => InternalServerError()
-              case Right(created) => Ok(created.asJson)
+              case Right(created) => Ok(created)
             }
           }
         } yield created

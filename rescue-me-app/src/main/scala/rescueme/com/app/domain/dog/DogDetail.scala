@@ -15,3 +15,23 @@ case class DogDetail(
     dateOfBirth: Option[Date] = None,
     since: Option[Date] = None
 )
+object DogDetail {
+  def apply(
+      dogId: UUID,
+      name: Name,
+      breed: Breed,
+      color: String,
+      description: Description,
+      gender: Gender,
+      size: Size
+  ) =
+    new DogDetail(dogId = dogId,
+                  name = name,
+                  breed = breed,
+                  color = color,
+                  description = description,
+                  gender = gender,
+                  size = size,
+                  dateOfBirth = None,
+                  since = None)
+}

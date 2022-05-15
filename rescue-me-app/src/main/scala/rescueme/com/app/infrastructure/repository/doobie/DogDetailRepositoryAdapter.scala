@@ -2,23 +2,27 @@ package rescueme.com.app.infrastructure.repository.doobie
 
 import cats.data.OptionT
 import cats.effect.Async
+import doobie._
 import doobie.implicits._
-import doobie.util.transactor.Transactor
-import rescueme.com.app.domain.Identifier
 import rescueme.com.app.domain.dog.{DogDetail, DogDetailRepositoryAlgebra}
+import rescueme.com.app.domain._
 
 object Q {
+
+  implicit val genderMap: Meta[Gender] = Meta[String].imap(x => Gender.fromString(x))(x => x.toString)
+  implicit val sizeMap: Meta[Size]     = Meta[String].imap(x => Size.fromString(x))(x => x.toString)
+
   def get(id: Identifier): doobie.Query0[DogDetail] =
     sql"""
-      SELECT * FROM dog_details WHERE id = $id
+      SELECT * FROM dog_details WHERE id = ${id.toString}
        """.query[DogDetail]
 
-  def update(dogDetail: DogDetail): doobie.Update0 = sql"""""".update
+  def update(dogDetail: DogDetail): doobie.Update0 = ???
   def create(dogDetail: DogDetail): doobie.Update0 =
     sql"""
       INSERT INTO dog_details (id, name, breed, description, gender, size, color, date_of_birth, since)
       VALUES (
-        ${dogDetail.dogId},
+        ${dogDetail.dogId.toString},
         ${dogDetail.name},
         ${dogDetail.breed},
         ${dogDetail.description},
