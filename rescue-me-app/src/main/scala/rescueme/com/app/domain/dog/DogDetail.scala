@@ -10,8 +10,8 @@ case class DogDetail(
     breed: Breed,
     color: String,
     description: Description,
-    gender: String,
-    size: String,
+    gender: Gender,
+    size: Size,
     dateOfBirth: Option[Date] = None,
     since: Option[Date] = None
 )
@@ -32,8 +32,8 @@ object DogDetail {
                   breed = breed,
                   color = color,
                   description = description,
-                  gender = gender,
-                  size = size,
+                  gender = Gender.fromString(gender),
+                  size = Size.fromString(size),
                   dateOfBirth,
                   since)
 }

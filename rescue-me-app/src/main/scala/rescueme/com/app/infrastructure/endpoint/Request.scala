@@ -28,8 +28,8 @@ object Response {
       detail.breed,
       detail.color,
       detail.description,
-      detail.gender,
-      detail.size
+      detail.gender.toString,
+      detail.size.toString
     )
   }
 }
