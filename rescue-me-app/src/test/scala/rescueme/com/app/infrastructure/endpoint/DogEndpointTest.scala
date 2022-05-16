@@ -15,7 +15,7 @@ import org.scalatest.matchers.must.Matchers
 import org.scalatest.matchers.should.Matchers.convertToAnyShouldWrapper
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
 import rescueme.com.app.Arbitraries
-import rescueme.com.app.domain.dog.{Dog, DogDetailRepositoryAlgebra, DogRepositoryAlgebra, DogService}
+import rescueme.com.app.domain.dog.{Dog, DogDetailRepositoryAlgebra, DogDetailService, DogRepositoryAlgebra, DogService, DogValidatorInterpreter}
 import rescueme.com.app.domain.shelter.{ShelterValidation, ShelterValidationInterpreter}
 import rescueme.com.app.infrastructure.repository.{DogDetailStubRepository, DogStubRepository, ShelterStubRepository}
 
@@ -36,7 +36,9 @@ class DogEndpointTest
   val dogDetailRepo: DogDetailRepositoryAlgebra[IO]  = DogDetailStubRepository
   val shelterValidation: ShelterValidation[IO]       = ShelterValidationInterpreter[IO](ShelterStubRepository)
   val dogService: DogService[IO]                     = DogService(dogRepo, shelterValidation)
-  val router: HttpApp[IO]                            = Router("/dogs" -> DogEndpoint.endpoints[IO](dogService)).orNotFound
+  val dogValidator: DogValidatorInterpreter[IO]      = DogValidatorInterpreter.make(dogRepo)
+  val dogDetailsService: DogDetailService[IO]        = DogDetailService.make(dogDetailRepo, dogValidator)
+  val router: HttpApp[IO]                            = Router("/dogs" -> DogEndpoint.endpoints[IO](dogService, dogDetailsService)).orNotFound
 
   test("Should return ok") {
     forAll { (dog: Dog) =>

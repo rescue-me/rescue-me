@@ -7,8 +7,9 @@ import io.circe.syntax._
 import org.http4s.circe.CirceEntityCodec._
 import org.http4s.circe._
 import org.http4s.dsl.Http4sDsl
-import org.http4s.{EntityDecoder, HttpRoutes, QueryParamDecoder}
+import org.http4s.{HttpRoutes, QueryParamDecoder}
 import rescueme.com.app.domain.dog.{Dog, DogDetail, DogDetailService, DogService}
+import rescueme.com.app.infrastructure.endpoint.Request.DogDetailsRequest
 
 import java.util.UUID
 
@@ -64,31 +65,34 @@ class DogEndpoint[F[_]: Sync] {
   }
 
   private def details(dogDetailsService: DogDetailService[F]): HttpRoutes[F] = {
+    import Request._
+    import Response._
+
     HttpRoutes.of[F] {
       case GET -> Root / UUIDVar(id) / "details" => {
         dogDetailsService.get(id).value flatMap {
           case Left(_)        => BadRequest(s"Dog with id: $id not found")
-          case Right(details) => Ok(details.asJson)
+          case Right(details) => Ok(details.toResponse.asJson)
         }
       }
       case req @ POST -> Root / UUIDVar(id) / "details" => {
         for {
-          dogDetails <- req.as[DogDetail]
+          dogDetails <- req.as[DogDetailsRequest].map(_.toDogDetails(id))
           created <- withValidation(sameId(id, dogDetails)) { valid =>
             dogDetailsService.create(valid).value match {
               case Left           => InternalServerError()
-              case Right(created) => Ok(created.asJson)
+              case Right(created: DogDetail) => Ok(created.toResponse.asJson)
             }
           }
         } yield created
       }
       case req @ PUT -> Root / UUIDVar(id) / "details" => {
         for {
-          dogDetails <- req.as[DogDetail]
+          dogDetails <- req.as[DogDetailsRequest].map(_.toDogDetails(id))
           created <- withValidation(sameId(id, dogDetails)) { valid =>
             dogDetailsService.update(valid).value match {
               case Left           => InternalServerError()
-              case Right(created) => Ok(created.asJson)
+              case Right(created: DogDetail) => Ok(created.toResponse.asJson)
             }
           }
         } yield created
