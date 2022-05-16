@@ -3,9 +3,9 @@ package rescueme.com.app.domain.dog
 import cats.Monad
 import cats.data.EitherT
 import rescueme.com.app.domain.{DogNotFound, DomainError, Identifier}
-import rescueme.com.app.domain.shelter.ShelterValidation
+import rescueme.com.app.domain.shelter.ShelterValidator
 
-class DogService[F[_]: Monad](repository: DogRepositoryAlgebra[F], shelterValidation: ShelterValidation[F]) {
+class DogService[F[_]: Monad](repository: DogRepositoryAlgebra[F], shelterValidation: ShelterValidator[F]) {
 
   def all(): F[List[Dog]] = repository.all()
 
@@ -23,6 +23,6 @@ class DogService[F[_]: Monad](repository: DogRepositoryAlgebra[F], shelterValida
 
 object DogService {
   def apply[F[_]: Monad](repositoryAlgebra: DogRepositoryAlgebra[F],
-                         shelterValidation: ShelterValidation[F]): DogService[F] =
+                         shelterValidation: ShelterValidator[F]): DogService[F] =
     new DogService[F](repositoryAlgebra, shelterValidation)
 }

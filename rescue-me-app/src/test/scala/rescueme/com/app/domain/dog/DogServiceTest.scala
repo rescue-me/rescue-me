@@ -9,7 +9,7 @@ import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
 import org.scalatestplus.mockito.MockitoSugar
 import rescueme.com.app.domain.{DogNotFound, ShelterNotFound}
-import rescueme.com.app.domain.shelter.{Shelter, ShelterValidation}
+import rescueme.com.app.domain.shelter.{Shelter, ShelterValidator}
 
 import java.util.UUID
 import scala.util.Random
@@ -20,7 +20,7 @@ class DogServiceTest extends AnyFlatSpec with Matchers with MockitoSugar with Ei
   val shelter: Shelter                         = Shelter(Some(UUID.randomUUID()), "test-name", "test-description")
   val dog: Dog                                 = Dog("budy-test", "tester", "great testing", UUID.randomUUID())
   val repo: DogRepositoryAlgebra[IO]           = mock[DogRepositoryAlgebra[IO]]
-  val shelterValidation: ShelterValidation[IO] = mock[ShelterValidation[IO]]
+  val shelterValidation: ShelterValidator[IO] = mock[ShelterValidator[IO]]
   val dogService: DogService[IO]               = DogService[IO](repo, shelterValidation)
 
   it should "should create dog" in {

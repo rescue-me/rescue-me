@@ -13,7 +13,7 @@ trait DogDetailService[F[_]] {
 
 object DogDetailService {
   def make[F[_]: Monad](dogRepository: DogDetailRepositoryAlgebra[F],
-                        dogValidatorInterpreter: DogValidatorInterpreter[F]): DogDetailService[F] =
+                        dogValidatorInterpreter: DogValidator[F]): DogDetailService[F] =
     new DogDetailService[F] {
       override def get(id: Identifier): EitherT[F, DogNotFound.type, DogDetail] =
         EitherT.fromOptionF(dogRepository.getDetails(id), DogNotFound)

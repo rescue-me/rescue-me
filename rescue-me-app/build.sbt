@@ -16,7 +16,7 @@ val DoobieVersion              = "0.13.4"
 val ScalaCheckVersion          = "1.15.4"
 val ScalaTestVersion           = "3.2.9"
 val ScalaTestPlusVersion       = "3.2.2.0"
-val testcontainersScalaVersion = "0.40.5"
+val testcontainersScalaVersion = "0.40.7"
 val TsecVersion                = "0.2.1"
 
 libraryDependencies ++= Seq(

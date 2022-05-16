@@ -15,8 +15,8 @@ import org.scalatest.matchers.must.Matchers
 import org.scalatest.matchers.should.Matchers.convertToAnyShouldWrapper
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
 import rescueme.com.app.Arbitraries
-import rescueme.com.app.domain.dog.{Dog, DogDetailRepositoryAlgebra, DogDetailService, DogRepositoryAlgebra, DogService, DogValidatorInterpreter}
-import rescueme.com.app.domain.shelter.{ShelterValidation, ShelterValidationInterpreter}
+import rescueme.com.app.domain.dog.{Dog, DogDetailRepositoryAlgebra, DogDetailService, DogRepositoryAlgebra, DogService, DogValidator}
+import rescueme.com.app.domain.shelter.{ShelterValidator, ShelterValidator}
 import rescueme.com.app.infrastructure.repository.{DogDetailStubRepository, DogStubRepository, ShelterStubRepository}
 
 import java.util.UUID
@@ -34,9 +34,9 @@ class DogEndpointTest
   implicit val entityEncoder: EntityEncoder[IO, Dog] = jsonEncoderOf[IO, Dog]
   val dogRepo: DogRepositoryAlgebra[IO]              = DogStubRepository
   val dogDetailRepo: DogDetailRepositoryAlgebra[IO]  = DogDetailStubRepository
-  val shelterValidation: ShelterValidation[IO]       = ShelterValidationInterpreter[IO](ShelterStubRepository)
+  val shelterValidation: ShelterValidator[IO]        = ShelterValidator.make[IO](ShelterStubRepository)
   val dogService: DogService[IO]                     = DogService(dogRepo, shelterValidation)
-  val dogValidator: DogValidatorInterpreter[IO]      = DogValidatorInterpreter.make(dogRepo)
+  val dogValidator: DogValidator[IO]                 = DogValidator.make(dogRepo)
   val dogDetailsService: DogDetailService[IO]        = DogDetailService.make(dogDetailRepo, dogValidator)
   val router: HttpApp[IO]                            = Router("/dogs" -> DogEndpoint.endpoints[IO](dogService, dogDetailsService)).orNotFound
 
