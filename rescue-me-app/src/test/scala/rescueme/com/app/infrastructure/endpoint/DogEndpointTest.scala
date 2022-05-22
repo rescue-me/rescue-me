@@ -14,9 +14,8 @@ import org.scalatest.funsuite.AnyFunSuite
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.matchers.should.Matchers.convertToAnyShouldWrapper
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
-import rescueme.com.app.Arbitraries
 import rescueme.com.app.domain.dog.{Dog, DogDetailRepositoryAlgebra, DogDetailService, DogRepositoryAlgebra, DogService, DogValidator}
-import rescueme.com.app.domain.shelter.{ShelterValidator}
+import rescueme.com.app.domain.shelter.ShelterValidator
 import rescueme.com.app.infrastructure.repository.{DogDetailStubRepository, DogStubRepository, ShelterStubRepository}
 
 import java.util.UUID

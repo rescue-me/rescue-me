@@ -94,6 +94,5 @@ class DogServiceTest
       retrieved shouldBe Left(DogNotFound)
     }
 
-  }
 
 }
