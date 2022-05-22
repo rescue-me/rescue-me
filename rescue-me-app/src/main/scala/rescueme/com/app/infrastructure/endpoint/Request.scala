@@ -1,6 +1,6 @@
 package rescueme.com.app.infrastructure.endpoint
 
-import rescueme.com.app.domain.Identifier
+import rescueme.com.app.domain._
 import rescueme.com.app.domain.dog.DogDetail
 
 object Request {
@@ -11,7 +11,8 @@ object Request {
                                description: String,
                                gender: String,
                                size: String) {
-    def toDogDetails(id: Identifier): DogDetail = DogDetail(id, name, breed, color, description, gender, size)
+    def toDogDetails(id: Identifier): DogDetail =
+      DogDetail(id, name, breed, color, description, Gender.fromString(gender), Size.fromString(size))
   }
 }
 

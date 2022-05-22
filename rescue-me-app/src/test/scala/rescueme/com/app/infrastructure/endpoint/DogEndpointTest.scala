@@ -16,17 +16,17 @@ import org.scalatest.matchers.should.Matchers.convertToAnyShouldWrapper
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
 import rescueme.com.app.Arbitraries
 import rescueme.com.app.domain.dog.{Dog, DogDetailRepositoryAlgebra, DogDetailService, DogRepositoryAlgebra, DogService, DogValidator}
-import rescueme.com.app.domain.shelter.{ShelterValidator, ShelterValidator}
+import rescueme.com.app.domain.shelter.{ShelterValidator}
 import rescueme.com.app.infrastructure.repository.{DogDetailStubRepository, DogStubRepository, ShelterStubRepository}
 
 import java.util.UUID
+import org.scalacheck.ScalacheckShapeless._
 
 class DogEndpointTest
     extends AnyFunSuite
     with Matchers
     with Http4sDsl[IO]
     with Http4sClientDsl[IO]
-    with Arbitraries
     with ScalaCheckPropertyChecks
     with OptionValues {
 
