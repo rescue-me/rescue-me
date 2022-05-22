@@ -1,6 +1,0 @@
-*.class
-*.log
-target/
-.idea/
-.bsp
-project/.bloop/
