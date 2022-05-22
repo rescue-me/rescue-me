@@ -12,12 +12,16 @@ import org.http4s.{EntityDecoder, EntityEncoder, HttpApp, Uri}
 import org.scalatest.OptionValues
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
+import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
 import rescueme.com.app.domain.shelter.{Shelter, ShelterService}
 import rescueme.com.app.infrastructure.repository.ShelterStubRepository
+import org.scalacheck.ScalacheckShapeless._
+import org.scalatest.funsuite.AnyFunSuite
 
 class ShelterEndpointTest
-    extends AnyFlatSpec
+    extends AnyFunSuite
     with Matchers
+      with ScalaCheckPropertyChecks
     with Http4sDsl[IO]
     with Http4sClientDsl[IO]
     with OptionValues {
@@ -26,30 +30,32 @@ class ShelterEndpointTest
   implicit val entityEncoder: EntityEncoder[IO, Shelter] = jsonEncoderOf[IO, Shelter]
   val service: ShelterService[IO]                        = ShelterService[IO](ShelterStubRepository)
   val router: HttpApp[IO]                                = Router("/shelter" -> ShelterEndpoint.endpoints[IO](service)).orNotFound
-  val shelter: Shelter                                   = Shelter("shelter-test", "province-test")
 
-  behavior of "Shelter endpoint stack"
 
-  it should "create new shelter ok and retrieve it" in {
-    (for {
-      createReq  <- POST(shelter, uri"/shelter")
-      createRes  <- router.run(createReq)
-      createdDog <- createRes.as[Shelter]
-      reqById    <- GET(Uri.unsafeFromString(s"/shelter/${createdDog.id.value}"))
-      resById    <- router.run(reqById)
-      body       <- resById.as[Shelter]
-    } yield {
-      createdDog shouldBe body
-    }).unsafeRunSync()
+  test( "create new shelter ok and retrieve it" ) {
+    forAll {
+      shelter: Shelter =>
+        (for {
+          createReq  <- POST(shelter, uri"/shelter")
+          createRes  <- router.run(createReq)
+          createdDog <- createRes.as[Shelter]
+          reqById    <- GET(Uri.unsafeFromString(s"/shelter/${createdDog.id.value}"))
+          resById    <- router.run(reqById)
+          body       <- resById.as[Shelter]
+        } yield {
+          createdDog shouldBe body
+        }).unsafeRunSync()
+    }
+
   }
 
-  it should "retrieve shelters" in {
-    (for {
-      listReq  <- GET( uri"/shelter")
-      listRes  <- router.run(listReq)
-      allShelters <- listRes.as[List[Shelter]]
-    } yield {
-      allShelters.size should be > 0
-    }).unsafeRunSync()
+  test( "retrieve shelters") {
+        (for {
+          listReq  <- GET( uri"/shelter")
+          listRes  <- router.run(listReq)
+          allShelters <- listRes.as[List[Shelter]]
+        } yield {
+          allShelters.size should be > 0
+        }).unsafeRunSync()
   }
 }
