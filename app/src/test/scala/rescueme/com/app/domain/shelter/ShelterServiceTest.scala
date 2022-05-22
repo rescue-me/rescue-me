@@ -2,55 +2,69 @@ package rescueme.com.app.domain.shelter
 
 import cats.effect.IO
 import org.mockito.Mockito.when
-import org.scalatest.{EitherValues, OptionValues}
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
+import org.scalatest.{EitherValues, OptionValues}
 import org.scalatestplus.mockito.MockitoSugar
+import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
 import rescueme.com.app.domain.ShelterNotFound
+import org.scalacheck.ScalacheckShapeless._
+import org.scalatest.funsuite.AnyFunSuite
 
 import java.util.UUID
 
-class ShelterServiceTest extends AnyFlatSpec with Matchers with MockitoSugar with EitherValues with OptionValues {
+class ShelterServiceTest
+  extends AnyFunSuite
+    with ScalaCheckPropertyChecks
+    with Matchers
+    with MockitoSugar
+    with EitherValues
+    with OptionValues {
 
-  behavior of "shelter service"
-
-  val shelter: Shelter                                = Shelter("shelter-test", "province-test")
   val repositoryAlgebra: ShelterRepositoryAlgebra[IO] = mock[ShelterRepositoryAlgebra[IO]]
   val shelterService: ShelterService[IO]              = ShelterService[IO](repositoryAlgebra)
 
-  it should "create shelter ok" in {
+  test("create shelter ok"){
 
-    when(repositoryAlgebra.create(shelter)).thenReturn(IO.pure(shelter))
+    forAll { shelter: Shelter =>
+      when(repositoryAlgebra.create(shelter)).thenReturn(IO.pure(shelter))
 
-    val result = shelterService.create(shelter).value.unsafeRunSync()
+      val result = shelterService.create(shelter).value.unsafeRunSync()
 
-    result.value shouldBe shelter
+      result.value shouldBe shelter
+    }
   }
 
-  it should "retrieve all shelters" in {
-    when(repositoryAlgebra.all()).thenReturn(IO.pure(List(shelter)))
+  test("retrieve all shelters" ) {
 
-    shelterService.all().unsafeRunSync() shouldBe List(shelter)
+    forAll { shelter: Shelter =>
+      when(repositoryAlgebra.all()).thenReturn(IO.pure(List(shelter)))
+
+      shelterService.all().unsafeRunSync() shouldBe List(shelter)
+    }
   }
 
-  it should "retrieve shelter by id ok" in {
+  test( "retrieve shelter by id ok" ) {
 
-    val id = UUID.randomUUID()
-    when(repositoryAlgebra.get(id)).thenReturn(IO.pure(Some(shelter)))
+    forAll { shelter: Shelter =>
+      val id = UUID.randomUUID()
+      when(repositoryAlgebra.get(id)).thenReturn(IO.pure(Some(shelter)))
 
-    val result = shelterService.get(id).value.unsafeRunSync()
+      val result = shelterService.get(id).value.unsafeRunSync()
 
-    result.value shouldBe shelter
+      result.value shouldBe shelter
+    }
   }
 
-  it should "return left when shelter not found" in {
+  test( "return left when shelter not found" ) {
+    forAll { shelter: Shelter =>
+      val id = UUID.randomUUID()
+      when(repositoryAlgebra.get(id)).thenReturn(IO.pure(None))
 
-    val id = UUID.randomUUID()
-    when(repositoryAlgebra.get(id)).thenReturn(IO.pure(None))
+      val result = shelterService.get(id).value.unsafeRunSync()
 
-    val result = shelterService.get(id).value.unsafeRunSync()
-
-    result shouldBe Left(ShelterNotFound)
+      result shouldBe Left(ShelterNotFound)
+    }
   }
 
 }
