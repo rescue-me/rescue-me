@@ -28,7 +28,7 @@ class ShelterEndpointTest
 
   implicit val entityDecoder: EntityDecoder[IO, Shelter] = jsonOf[IO, Shelter]
   implicit val entityEncoder: EntityEncoder[IO, Shelter] = jsonEncoderOf[IO, Shelter]
-  val service: ShelterService[IO]                        = ShelterService[IO](ShelterStubRepository)
+  val service: ShelterService[IO]                        = ShelterService.impl[IO](ShelterStubRepository)
   val router: HttpApp[IO]                                = Router("/shelter" -> ShelterEndpoint.endpoints[IO](service)).orNotFound
 
 

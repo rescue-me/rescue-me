@@ -31,7 +31,7 @@ object Server extends IOApp {
       shelterRepo       = ShelterDoobieRepositoryAdapter[F](xa)
       shelterValidation = ShelterValidator.make[F](shelterRepo)
       dogService        = DogService.impl[F](dogRepo, shelterValidation)
-      shelterService    = ShelterService[F](shelterRepo)
+      shelterService    = ShelterService.impl[F](shelterRepo)
       dogValidation     = DogValidator.make[F](dogRepo)
       dogDetailRepo     = DogDetailRepositoryAdapter.make(xa)
       dogDetailService  = DogDetailService.make(dogDetailRepo, dogValidation)

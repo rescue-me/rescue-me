@@ -22,7 +22,7 @@ class ShelterServiceTest
     with OptionValues {
 
   val repositoryAlgebra: ShelterRepositoryAlgebra[IO] = mock[ShelterRepositoryAlgebra[IO]]
-  val shelterService: ShelterService[IO]              = ShelterService[IO](repositoryAlgebra)
+  val shelterService: ShelterService[IO]              = ShelterService.impl[IO](repositoryAlgebra)
 
   test("create shelter ok"){
 
@@ -40,7 +40,7 @@ class ShelterServiceTest
     forAll { shelter: Shelter =>
       when(repositoryAlgebra.all()).thenReturn(IO.pure(List(shelter)))
 
-      shelterService.all().unsafeRunSync() shouldBe List(shelter)
+      shelterService.all.unsafeRunSync() shouldBe List(shelter)
     }
   }
 

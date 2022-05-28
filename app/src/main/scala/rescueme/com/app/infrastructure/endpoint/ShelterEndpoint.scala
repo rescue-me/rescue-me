@@ -13,11 +13,16 @@ class ShelterEndpoint[F[_]: Sync] extends Http4sDsl[F] {
 
   implicit val shelterDecoder: EntityDecoder[F, Shelter] = jsonOf
 
+  def endpoints(shelterService: ShelterService[F]): HttpRoutes[F] =
+    findAllShelters(shelterService) <+>
+      createShelter(shelterService) <+>
+      get(shelterService)
+
   private def findAllShelters(shelterService: ShelterService[F]): HttpRoutes[F] =
     HttpRoutes.of[F] {
       case GET -> Root =>
         for {
-          all  <- shelterService.all()
+          all  <- shelterService.all
           resp <- Ok(all.asJson)
         } yield resp
     }
@@ -45,11 +50,6 @@ class ShelterEndpoint[F[_]: Sync] extends Http4sDsl[F] {
         }
     }
   }
-
-  def endpoints(shelterService: ShelterService[F]): HttpRoutes[F] =
-    findAllShelters(shelterService) <+>
-      createShelter(shelterService) <+>
-      get(shelterService)
 
 }
 object ShelterEndpoint {
