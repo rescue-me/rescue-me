@@ -1,6 +1,6 @@
 package rescueme.com.app.infrastructure.endpoint
 
-import cats.effect.Sync
+import cats.effect.kernel.Async
 import cats.syntax.all._
 import io.circe.generic.auto._
 import io.circe.syntax._
@@ -12,14 +12,18 @@ import rescueme.com.app.domain.dog.{Dog, DogDetail, DogDetailService, DogService
 
 import java.util.UUID
 
-class DogEndpoint[F[_]: Sync] {
+class DogEndpoint[F[_]: Async] {
 
   implicit val dsl = Http4sDsl.apply[F]
   import dsl._
 
   implicit val shelterIdQueryParamDecoder: QueryParamDecoder[UUID] = QueryParamDecoder[String].map(UUID.fromString)
 
-  object ShelterFilterQueryParamMatcher extends QueryParamDecoderMatcher[UUID]("shelter")
+  def endpoints(dogService: DogService[F], dogDetailsService: DogDetailService[F]): HttpRoutes[F] =
+    findDogs(dogService) <+>
+      createDog(dogService) <+>
+      get(dogService) <+>
+      details(dogDetailsService)
 
   private def findDogs(dogService: DogService[F]): HttpRoutes[F] =
     HttpRoutes.of[F] {
@@ -79,7 +83,7 @@ class DogEndpoint[F[_]: Sync] {
           dogDetails <- req.as[DogDetailsRequest].map(_.toDogDetails(id))
           created <- withValidation(sameId(id, dogDetails)) { valid =>
             dogDetailsService.create(valid).value match {
-              case Left           => InternalServerError()
+              case Left                      => InternalServerError()
               case Right(created: DogDetail) => Ok(created.toResponse.asJson)
             }
           }
@@ -90,7 +94,7 @@ class DogEndpoint[F[_]: Sync] {
           dogDetails <- req.as[DogDetailsRequest].map(_.toDogDetails(id))
           created <- withValidation(sameId(id, dogDetails)) { valid =>
             dogDetailsService.update(valid).value match {
-              case Left           => InternalServerError()
+              case Left                      => InternalServerError()
               case Right(created: DogDetail) => Ok(created.toResponse.asJson)
             }
           }
@@ -99,15 +103,11 @@ class DogEndpoint[F[_]: Sync] {
     }
   }
 
-  def endpoints(dogService: DogService[F], dogDetailsService: DogDetailService[F]): HttpRoutes[F] =
-    findDogs(dogService) <+>
-      createDog(dogService) <+>
-      get(dogService) <+>
-      details(dogDetailsService)
+  object ShelterFilterQueryParamMatcher extends QueryParamDecoderMatcher[UUID]("shelter")
 }
 
 object DogEndpoint {
-  def endpoints[F[_]: Sync](
+  def endpoints[F[_]: Async](
       dogService: DogService[F],
       dogDetailsService: DogDetailService[F]
   ): HttpRoutes[F] = new DogEndpoint[F].endpoints(dogService, dogDetailsService)

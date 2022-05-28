@@ -1,6 +1,6 @@
 package rescueme.com.app.config
 
-import cats.effect.{Async, Blocker, ContextShift, Resource}
+import cats.effect.{Async, Resource}
 import doobie.hikari.HikariTransactor
 
 import scala.concurrent.ExecutionContext
@@ -15,11 +15,10 @@ case class DatabaseConfig(
 )
 
 object DatabaseConfig {
-  def dbTransactor[F[_]: Async: ContextShift](
+  def dbTransactor[F[_]: Async](
       dbc: DatabaseConfig,
-      connEc: ExecutionContext,
-      blocker: Blocker,
+      connEc: ExecutionContext
   ): Resource[F, HikariTransactor[F]] =
     HikariTransactor
-      .newHikariTransactor[F](dbc.driver, dbc.url, dbc.user, dbc.password, connEc, blocker)
+      .newHikariTransactor[F](dbc.driver, dbc.url, dbc.user, dbc.password, connEc)
 }

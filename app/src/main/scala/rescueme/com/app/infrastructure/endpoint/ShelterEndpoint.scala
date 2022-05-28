@@ -1,6 +1,6 @@
 package rescueme.com.app.infrastructure.endpoint
 
-import cats.effect.Sync
+import cats.effect.kernel.Async
 import cats.syntax.all._
 import io.circe.generic.auto._
 import io.circe.syntax._
@@ -9,7 +9,7 @@ import org.http4s.dsl.Http4sDsl
 import org.http4s.{EntityDecoder, HttpRoutes}
 import rescueme.com.app.domain.shelter.{Shelter, ShelterService}
 
-class ShelterEndpoint[F[_]: Sync] extends Http4sDsl[F] {
+class ShelterEndpoint[F[_]: Async] extends Http4sDsl[F] {
 
   implicit val shelterDecoder: EntityDecoder[F, Shelter] = jsonOf
 
@@ -53,6 +53,6 @@ class ShelterEndpoint[F[_]: Sync] extends Http4sDsl[F] {
 
 }
 object ShelterEndpoint {
-  def endpoints[F[_]: Sync](shelterService: ShelterService[F]): HttpRoutes[F] =
+  def endpoints[F[_]: Async](shelterService: ShelterService[F]): HttpRoutes[F] =
     new ShelterEndpoint[F].endpoints(shelterService)
 }

@@ -1,11 +1,12 @@
 package rescueme.com.app
 
 import cats.effect._
+import com.comcast.ip4s.IpLiteralSyntax
 import doobie.util.ExecutionContexts
 import io.circe.config.parser
 import io.circe.generic.auto._
+import org.http4s.ember.server.EmberServerBuilder
 import org.http4s.implicits._
-import org.http4s.server.blaze.BlazeServerBuilder
 import org.http4s.server.{Router, Server => H4Server}
 import rescueme.com.app.config.{DatabaseConfig, RescuemeConfig}
 import rescueme.com.app.domain.dog.{DogDetailService, DogService, DogValidator}
@@ -16,16 +17,15 @@ import rescueme.com.app.infrastructure.repository.doobie.{DogDetailRepositoryAda
 object Server extends IOApp {
 
   override def run(args: List[String]): IO[ExitCode] =
-    createServer
-      .use(_ => IO.never)
+    createServer[IO].useForever
       .as(ExitCode.Success)
 
-  def createServer[F[_]: ContextShift: ConcurrentEffect: Timer]: Resource[F, H4Server[F]] =
+  def createServer[F[_]: Async]: Resource[F, H4Server] =
     for {
       conf     <- Resource.eval(parser.decodePathF[F, RescuemeConfig]("application"))
       connEc   <- ExecutionContexts.fixedThreadPool[F](conf.db.connections.poolSize)
       txnEc    <- ExecutionContexts.cachedThreadPool[F]
-      xa       <- DatabaseConfig.dbTransactor(conf.db, connEc, Blocker.liftExecutionContext(txnEc))
+      xa       <- DatabaseConfig.dbTransactor(conf.db, connEc)
       serverEc <- ExecutionContexts.cachedThreadPool[F]
       dogRepo           = DogDoobieRepositoryAdapter[F](xa)
       shelterRepo       = ShelterDoobieRepositoryAdapter[F](xa)
@@ -39,10 +39,12 @@ object Server extends IOApp {
         "/api/dog"     -> DogEndpoint.endpoints(dogService, dogDetailService),
         "/api/shelter" -> ShelterEndpoint.endpoints(shelterService)
       ).orNotFound
-      server <- BlazeServerBuilder[F](serverEc)
-        .bindHttp(8080, "localhost")
+      server <- EmberServerBuilder
+        .default[F]
+        .withHost(host"localhost")
+        .withPort(port"8080")
         .withHttpApp(httpApp)
-        .resource
+        .build
     } yield server
 
 }
