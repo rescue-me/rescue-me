@@ -15,6 +15,11 @@ import rescueme.com.app.infrastructure.repository.doobie.{DogDetailRepositoryAda
 
 object Server extends IOApp {
 
+  override def run(args: List[String]): IO[ExitCode] =
+    createServer
+      .use(_ => IO.never)
+      .as(ExitCode.Success)
+
   def createServer[F[_]: ContextShift: ConcurrentEffect: Timer]: Resource[F, H4Server[F]] =
     for {
       conf     <- Resource.eval(parser.decodePathF[F, RescuemeConfig]("application"))
@@ -25,7 +30,7 @@ object Server extends IOApp {
       dogRepo           = DogDoobieRepositoryAdapter[F](xa)
       shelterRepo       = ShelterDoobieRepositoryAdapter[F](xa)
       shelterValidation = ShelterValidator.make[F](shelterRepo)
-      dogService        = DogService(dogRepo, shelterValidation)
+      dogService        = DogService.impl[F](dogRepo, shelterValidation)
       shelterService    = ShelterService[F](shelterRepo)
       dogValidation     = DogValidator.make[F](dogRepo)
       dogDetailRepo     = DogDetailRepositoryAdapter.make(xa)
@@ -39,10 +44,5 @@ object Server extends IOApp {
         .withHttpApp(httpApp)
         .resource
     } yield server
-
-  override def run(args: List[String]): IO[ExitCode] =
-    createServer
-      .use(_ => IO.never)
-      .as(ExitCode.Success)
 
 }

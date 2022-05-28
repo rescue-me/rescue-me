@@ -9,7 +9,6 @@ import org.http4s.circe._
 import org.http4s.dsl.Http4sDsl
 import org.http4s.{HttpRoutes, QueryParamDecoder}
 import rescueme.com.app.domain.dog.{Dog, DogDetail, DogDetailService, DogService}
-import rescueme.com.app.infrastructure.endpoint.Request.DogDetailsRequest
 
 import java.util.UUID
 
@@ -32,7 +31,7 @@ class DogEndpoint[F[_]: Sync] {
 
       case GET -> Root =>
         for {
-          retrieved <- dogService.all()
+          retrieved <- dogService.all
           resp <- Ok(retrieved.asJson).handleErrorWith { thr =>
             println(s"Error occurred $thr")
             InternalServerError()

@@ -34,7 +34,7 @@ class DogEndpointTest
   val dogRepo: DogRepositoryAlgebra[IO]              = DogStubRepository
   val dogDetailRepo: DogDetailRepositoryAlgebra[IO]  = DogDetailStubRepository
   val shelterValidation: ShelterValidator[IO]        = ShelterValidator.make[IO](ShelterStubRepository)
-  val dogService: DogService[IO]                     = DogService(dogRepo, shelterValidation)
+  val dogService: DogService[IO]                     = DogService.impl[IO](dogRepo, shelterValidation)
   val dogValidator: DogValidator[IO]                 = DogValidator.make(dogRepo)
   val dogDetailsService: DogDetailService[IO]        = DogDetailService.make(dogDetailRepo, dogValidator)
   val router: HttpApp[IO]                            = Router("/dogs" -> DogEndpoint.endpoints[IO](dogService, dogDetailsService)).orNotFound
