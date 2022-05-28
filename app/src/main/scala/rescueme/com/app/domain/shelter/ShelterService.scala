@@ -11,7 +11,7 @@ trait ShelterService[F[_]] {
 }
 
 object ShelterService {
-  def impl[F[_]: Functor](repository: ShelterRepositoryAlgebra[F]): ShelterService[F] = new ShelterService[F] {
+  def make[F[_]: Functor](repository: ShelterRepositoryAlgebra[F]): ShelterService[F] = new ShelterService[F] {
     def all: F[List[Shelter]]                                  = repository.all()
     def create(shelter: Shelter): EitherT[F, Throwable, Shelter] = EitherT.liftF(repository.create(shelter))
     def get(id: Identifier): EitherT[F, ShelterNotFound.type, Shelter] =

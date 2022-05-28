@@ -22,7 +22,7 @@ class ShelterServiceTest
     with OptionValues {
 
   val repositoryAlgebra: ShelterRepositoryAlgebra[IO] = mock[ShelterRepositoryAlgebra[IO]]
-  val shelterService: ShelterService[IO]              = ShelterService.impl[IO](repositoryAlgebra)
+  val shelterService: ShelterService[IO]              = ShelterService.make[IO](repositoryAlgebra)
 
   test("create shelter ok"){
 

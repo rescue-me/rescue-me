@@ -13,7 +13,7 @@ trait DogService[F[_]] {
 }
 
 object DogService {
-  def impl[F[_]: Monad](repository: DogRepositoryAlgebra[F], shelterValidation: ShelterValidator[F]): DogService[F] =
+  def make[F[_]: Monad](repository: DogRepositoryAlgebra[F], shelterValidation: ShelterValidator[F]): DogService[F] =
     new DogService[F] {
       def all: F[List[Dog]] = repository.all()
 

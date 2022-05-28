@@ -26,7 +26,7 @@ class DogServiceTest
   val shelter: Shelter                        = Shelter(Some(UUID.randomUUID()), "test-name", "test-description")
   val repo: DogRepositoryAlgebra[IO]          = mock[DogRepositoryAlgebra[IO]]
   val shelterValidation: ShelterValidator[IO] = mock[ShelterValidator[IO]]
-  val dogService: DogService[IO]              = DogService.impl[IO](repo, shelterValidation)
+  val dogService: DogService[IO]              = DogService.make[IO](repo, shelterValidation)
 
   test("should create dog") {
     forAll { dog: Dog =>
