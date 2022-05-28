@@ -8,6 +8,8 @@ import io.circe.generic.auto._
 import org.http4s.ember.server.EmberServerBuilder
 import org.http4s.implicits._
 import org.http4s.server.{Router, Server => H4Server}
+import org.typelevel.log4cats.slf4j.Slf4jLogger
+import org.typelevel.log4cats.{Logger, SelfAwareStructuredLogger}
 import rescueme.com.app.config.{DatabaseConfig, RescuemeConfig}
 import rescueme.com.app.domain.dog.{DogDetailService, DogService, DogValidator}
 import rescueme.com.app.domain.shelter.{ShelterService, ShelterValidator}
@@ -16,17 +18,17 @@ import rescueme.com.app.infrastructure.repository.doobie.{DogDetailRepositoryAda
 
 object Server extends IOApp {
 
+  implicit val logger: SelfAwareStructuredLogger[IO] = Slf4jLogger.getLogger[IO]
+
   override def run(args: List[String]): IO[ExitCode] =
     createServer[IO].useForever
       .as(ExitCode.Success)
 
-  def createServer[F[_]: Async]: Resource[F, H4Server] =
+  def createServer[F[_]: Async](implicit logger: Logger[F]): Resource[F, H4Server] =
     for {
-      conf     <- Resource.eval(parser.decodePathF[F, RescuemeConfig]("application"))
-      connEc   <- ExecutionContexts.fixedThreadPool[F](conf.db.connections.poolSize)
-      txnEc    <- ExecutionContexts.cachedThreadPool[F]
-      xa       <- DatabaseConfig.dbTransactor(conf.db, connEc)
-      serverEc <- ExecutionContexts.cachedThreadPool[F]
+      conf   <- Resource.eval(parser.decodePathF[F, RescuemeConfig]("application"))
+      connEc <- ExecutionContexts.fixedThreadPool[F](conf.db.connections.poolSize)
+      xa     <- DatabaseConfig.dbTransactor(conf.db, connEc)
       dogRepo           = DogDoobieRepositoryAdapter[F](xa)
       shelterRepo       = ShelterDoobieRepositoryAdapter[F](xa)
       shelterValidation = ShelterValidator.make[F](shelterRepo)
@@ -41,6 +43,7 @@ object Server extends IOApp {
       ).orNotFound
       server <- EmberServerBuilder
         .default[F]
+        .withLogger(logger)
         .withHost(host"localhost")
         .withPort(port"8080")
         .withHttpApp(httpApp)
