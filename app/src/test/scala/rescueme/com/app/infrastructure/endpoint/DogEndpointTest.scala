@@ -20,6 +20,7 @@ import rescueme.com.app.infrastructure.repository.{DogDetailStubRepository, DogS
 
 import java.util.UUID
 import org.scalacheck.ScalacheckShapeless._
+import cats.effect.unsafe.implicits.global
 
 class DogEndpointTest
     extends AnyFunSuite
@@ -42,11 +43,9 @@ class DogEndpointTest
   test("Should return ok") {
     forAll { (dog: Dog) =>
       (for {
-        createReq  <- POST(dog, uri"/dogs")
-        createRes  <- router.run(createReq)
+        createRes  <- router.run(POST(dog, uri"/dogs"))
         createdDog <- createRes.as[Dog]
-        req        <- GET(uri"/dogs")
-        resp       <- router.run(req)
+        resp       <- router.run(GET(uri"/dogs"))
         body       <- resp.as[List[Dog]]
       } yield {
         createRes.status shouldEqual Ok
@@ -59,11 +58,9 @@ class DogEndpointTest
   test("Should create and retrieve by id") {
     forAll { dog: Dog =>
       (for {
-        createReq  <- POST(dog, uri"/dogs")
-        createRes  <- router.run(createReq)
+        createRes  <- router.run(POST(dog, uri"/dogs"))
         createdDog <- createRes.as[Dog]
-        req        <- GET(Uri.unsafeFromString(s"/dogs/${createdDog.id.value}"))
-        resp       <- router.run(req)
+        resp       <- router.run(GET(Uri.unsafeFromString(s"/dogs/${createdDog.id.value}")))
         body       <- resp.as[Dog]
       } yield {
         body shouldBe createdDog
@@ -73,8 +70,7 @@ class DogEndpointTest
 
   test("Should retrieve by shelter") {
     (for {
-      req      <- GET(Uri.unsafeFromString(s"/dogs?shelter=${UUID.randomUUID()}"))
-      res      <- router.run(req)
+      res      <- router.run(GET(Uri.unsafeFromString(s"/dogs?shelter=${UUID.randomUUID()}")))
       response <- res.as[List[Dog]]
     } yield {
       response.size should be > 0

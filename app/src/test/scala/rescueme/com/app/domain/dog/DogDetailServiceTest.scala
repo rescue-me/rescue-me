@@ -9,6 +9,7 @@ import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
 import rescueme.com.app.domain._
 import org.scalacheck.ScalacheckShapeless._
+import cats.effect.unsafe.implicits.global
 
 class DogDetailServiceTest
     extends AnyFunSuite

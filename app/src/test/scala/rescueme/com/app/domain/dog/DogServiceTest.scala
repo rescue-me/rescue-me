@@ -12,6 +12,7 @@ import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
 import rescueme.com.app.domain.shelter.{Shelter, ShelterValidator}
 import rescueme.com.app.domain.{DogNotFound, ShelterNotFound}
+import cats.effect.unsafe.implicits.global
 
 import java.util.UUID
 

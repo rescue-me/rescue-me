@@ -1,6 +1,7 @@
 package rescueme.com.app.infrastructure.repository.doobie
 
-import cats.effect.{ContextShift, IO}
+import cats.effect.IO
+import cats.effect.unsafe.implicits.global
 import com.dimafeng.testcontainers.PostgreSQLContainer
 import doobie.implicits._
 import doobie.util.transactor.Transactor
@@ -13,8 +14,6 @@ import java.util.UUID
 import scala.concurrent.ExecutionContext
 
 class DogDoobieRepositoryAdapterTest extends AsyncFlatSpec with Matchers with BeforeAndAfterAll with OptionValues {
-
-  implicit private val ioContextShift: ContextShift[IO] = IO.contextShift(ExecutionContext.global)
 
   private val container: PostgreSQLContainer             = PostgreSQLContainer()
   private var transactor: doobie.Transactor[IO]          = _

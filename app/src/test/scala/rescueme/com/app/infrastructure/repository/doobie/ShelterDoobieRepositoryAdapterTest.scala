@@ -1,21 +1,19 @@
 package rescueme.com.app.infrastructure.repository.doobie
 
-import cats.effect.{ContextShift, IO}
+import cats.effect.IO
+import cats.effect.unsafe.implicits.global
 import com.dimafeng.testcontainers.PostgreSQLContainer
 import doobie.implicits._
+import doobie.util.transactor.Transactor
 import org.scalatest.flatspec.AsyncFlatSpec
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.{BeforeAndAfterAll, OptionValues}
-import doobie.util.transactor.Transactor
 import rescueme.com.app.domain.shelter.Shelter
-
-import scala.concurrent.ExecutionContext
 
 class ShelterDoobieRepositoryAdapterTest extends AsyncFlatSpec with Matchers with BeforeAndAfterAll with OptionValues {
 
-  implicit private val ioContextShift: ContextShift[IO]      = IO.contextShift(ExecutionContext.global)
-  private var repository: ShelterDoobieRepositoryAdapter[IO] = _
   private val container: PostgreSQLContainer                 = PostgreSQLContainer()
+  private var repository: ShelterDoobieRepositoryAdapter[IO] = _
   private var transactor: doobie.Transactor[IO]              = _
 
   override protected def beforeAll(): Unit = {

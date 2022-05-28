@@ -17,6 +17,7 @@ import rescueme.com.app.domain.shelter.{Shelter, ShelterService}
 import rescueme.com.app.infrastructure.repository.ShelterStubRepository
 import org.scalacheck.ScalacheckShapeless._
 import org.scalatest.funsuite.AnyFunSuite
+import cats.effect.unsafe.implicits.global
 
 class ShelterEndpointTest
     extends AnyFunSuite
@@ -36,11 +37,9 @@ class ShelterEndpointTest
     forAll {
       shelter: Shelter =>
         (for {
-          createReq  <- POST(shelter, uri"/shelter")
-          createRes  <- router.run(createReq)
+          createRes  <- router.run(POST(shelter, uri"/shelter"))
           createdDog <- createRes.as[Shelter]
-          reqById    <- GET(Uri.unsafeFromString(s"/shelter/${createdDog.id.value}"))
-          resById    <- router.run(reqById)
+          resById    <- router.run(GET(Uri.unsafeFromString(s"/shelter/${createdDog.id.value}")))
           body       <- resById.as[Shelter]
         } yield {
           createdDog shouldBe body
@@ -51,8 +50,7 @@ class ShelterEndpointTest
 
   test( "retrieve shelters") {
         (for {
-          listReq  <- GET( uri"/shelter")
-          listRes  <- router.run(listReq)
+          listRes  <- router.run(GET( uri"/shelter"))
           allShelters <- listRes.as[List[Shelter]]
         } yield {
           allShelters.size should be > 0

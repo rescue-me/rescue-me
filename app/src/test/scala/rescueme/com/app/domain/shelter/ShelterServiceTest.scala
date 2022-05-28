@@ -10,6 +10,7 @@ import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
 import rescueme.com.app.domain.ShelterNotFound
 import org.scalacheck.ScalacheckShapeless._
 import org.scalatest.funsuite.AnyFunSuite
+import cats.effect.unsafe.implicits.global
 
 import java.util.UUID
 
