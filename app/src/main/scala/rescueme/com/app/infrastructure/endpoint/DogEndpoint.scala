@@ -17,7 +17,8 @@ class DogEndpoint[F[_]: Async] {
   implicit val dsl = Http4sDsl.apply[F]
   import dsl._
 
-  implicit val shelterIdQueryParamDecoder: QueryParamDecoder[UUID] = QueryParamDecoder[String].map(UUID.fromString)
+  implicit val shelterIdQueryParamDecoder: QueryParamDecoder[UUID] =
+    QueryParamDecoder[String].map(UUID.fromString)
 
   def endpoints(dogService: DogService[F], dogDetailsService: DogDetailService[F]): HttpRoutes[F] =
     findDogs(dogService) <+>
@@ -44,26 +45,24 @@ class DogEndpoint[F[_]: Async] {
     }
 
   private def createDog(dogService: DogService[F]): HttpRoutes[F] = {
-    HttpRoutes.of[F] {
-      case req @ POST -> Root =>
-        val result = for {
-          dog <- req.as[Dog]
-          res <- dogService.create(dog).value
-        } yield res
-        result.flatMap {
-          case Right(dogCreated) => Ok(dogCreated.asJson)
-          case Left(_)           => Conflict(s"A dog with these fields already exists")
-        }
+    HttpRoutes.of[F] { case req @ POST -> Root =>
+      val result = for {
+        dog <- req.as[Dog]
+        res <- dogService.create(dog).value
+      } yield res
+      result.flatMap {
+        case Right(dogCreated) => Ok(dogCreated.asJson)
+        case Left(_)           => Conflict(s"A dog with these fields already exists")
+      }
     }
   }
 
   private def get(dogService: DogService[F]): HttpRoutes[F] = {
-    HttpRoutes.of[F] {
-      case GET -> Root / UUIDVar(id) =>
-        dogService.get(id).value flatMap {
-          case Left(_)    => BadRequest(s"Dog with id: $id not found")
-          case Right(dog) => Ok(dog.asJson)
-        }
+    HttpRoutes.of[F] { case GET -> Root / UUIDVar(id) =>
+      dogService.get(id).value flatMap {
+        case Left(_)    => BadRequest(s"Dog with id: $id not found")
+        case Right(dog) => Ok(dog.asJson)
+      }
     }
   }
 
@@ -72,13 +71,12 @@ class DogEndpoint[F[_]: Async] {
     import Response._
 
     HttpRoutes.of[F] {
-      case GET -> Root / UUIDVar(id) / "details" => {
+      case GET -> Root / UUIDVar(id) / "details" =>
         dogDetailsService.get(id).value flatMap {
           case Left(_)        => BadRequest(s"Dog with id: $id not found")
           case Right(details) => Ok(details.toResponse.asJson)
         }
-      }
-      case req @ POST -> Root / UUIDVar(id) / "details" => {
+      case req @ POST -> Root / UUIDVar(id) / "details" =>
         for {
           dogDetails <- req.as[DogDetailsRequest].map(_.toDogDetails(id))
           created <- withValidation(sameId(id, dogDetails)) { valid =>
@@ -88,8 +86,7 @@ class DogEndpoint[F[_]: Async] {
             }
           }
         } yield created
-      }
-      case req @ PUT -> Root / UUIDVar(id) / "details" => {
+      case req @ PUT -> Root / UUIDVar(id) / "details" =>
         for {
           dogDetails <- req.as[DogDetailsRequest].map(_.toDogDetails(id))
           created <- withValidation(sameId(id, dogDetails)) { valid =>
@@ -99,7 +96,6 @@ class DogEndpoint[F[_]: Async] {
             }
           }
         } yield created
-      }
     }
   }
 

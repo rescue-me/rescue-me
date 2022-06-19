@@ -6,3 +6,6 @@ target/
 project/.bloop/
 project/target/
 .DS_Store
+.metals/
+.vscode/
+.bloop/
