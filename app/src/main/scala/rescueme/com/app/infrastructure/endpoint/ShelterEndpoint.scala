@@ -19,35 +19,32 @@ class ShelterEndpoint[F[_]: Async] extends Http4sDsl[F] {
       get(shelterService)
 
   private def findAllShelters(shelterService: ShelterService[F]): HttpRoutes[F] =
-    HttpRoutes.of[F] {
-      case GET -> Root =>
-        for {
-          all  <- shelterService.all
-          resp <- Ok(all.asJson)
-        } yield resp
+    HttpRoutes.of[F] { case GET -> Root =>
+      for {
+        all  <- shelterService.all
+        resp <- Ok(all.asJson)
+      } yield resp
     }
 
   private def createShelter(shelterService: ShelterService[F]): HttpRoutes[F] = {
-    HttpRoutes.of[F] {
-      case req @ POST -> Root =>
-        val result = for {
-          shelter <- req.as[Shelter]
-          res     <- shelterService.create(shelter).value
-        } yield res
-        result.flatMap {
-          case Right(shelterCreated) => Ok(shelterCreated.asJson)
-          case Left(_)               => Conflict(s"A shelter with these fields already exists")
-        }
+    HttpRoutes.of[F] { case req @ POST -> Root =>
+      val result = for {
+        shelter <- req.as[Shelter]
+        res     <- shelterService.create(shelter).value
+      } yield res
+      result.flatMap {
+        case Right(shelterCreated) => Ok(shelterCreated.asJson)
+        case Left(_)               => Conflict(s"A shelter with these fields already exists")
+      }
     }
   }
 
   private def get(shelterService: ShelterService[F]): HttpRoutes[F] = {
-    HttpRoutes.of[F] {
-      case GET -> Root / UUIDVar(id) =>
-        shelterService.get(id).value flatMap {
-          case Left(_)        => BadRequest(s"Shelter with id: $id not found")
-          case Right(shelter) => Ok(shelter.asJson)
-        }
+    HttpRoutes.of[F] { case GET -> Root / UUIDVar(id) =>
+      shelterService.get(id).value flatMap {
+        case Left(_)        => BadRequest(s"Shelter with id: $id not found")
+        case Right(shelter) => Ok(shelter.asJson)
+      }
     }
   }
 

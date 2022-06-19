@@ -4,15 +4,15 @@ import cats.data.OptionT
 import cats.effect.Async
 import doobie._
 import doobie.implicits._
-
-import doobie.postgres.implicits._
-import rescueme.com.app.domain.dog.{DogDetail, DogDetailRepositoryAlgebra}
 import rescueme.com.app.domain._
+import rescueme.com.app.domain.dog.{DogDetail, DogDetailRepositoryAlgebra}
+import doobie.postgres.implicits._
 
 object Q {
 
-  implicit val genderMap: Meta[Gender] = Meta[String].imap(x => Gender.fromString(x))(x => x.toString)
-  implicit val sizeMap: Meta[Size]     = Meta[String].imap(x => Size.fromString(x))(x => x.toString)
+  implicit val genderMap: Meta[Gender] =
+    Meta[String].imap(x => Gender.fromString(x))(x => x.toString)
+  implicit val sizeMap: Meta[Size] = Meta[String].imap(x => Size.fromString(x))(x => x.toString)
 
   def get(id: Identifier): doobie.Query0[DogDetail] =
     sql"""

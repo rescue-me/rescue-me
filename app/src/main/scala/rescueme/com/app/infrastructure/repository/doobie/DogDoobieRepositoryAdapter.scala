@@ -3,7 +3,6 @@ package rescueme.com.app.infrastructure.repository.doobie
 import cats.effect.Async
 import doobie._
 import doobie.implicits._
-
 import doobie.postgres.implicits._
 import rescueme.com.app.domain.Identifier
 import rescueme.com.app.domain.dog.{Dog, DogRepositoryAlgebra}
@@ -26,10 +25,12 @@ object DogSql {
 
   def get(id: Identifier): Query0[Dog] = sql"SELECT * FROM dog where id=$id".query[Dog]
 
-  def getByShelterId(id: Identifier): Query0[Dog] = sql"SELECT * FROM dog where shelter_id=$id".query[Dog]
+  def getByShelterId(id: Identifier): Query0[Dog] =
+    sql"SELECT * FROM dog where shelter_id=$id".query[Dog]
 }
 
-class DogDoobieRepositoryAdapter[F[_]: Async](val xa: Transactor[F]) extends DogRepositoryAlgebra[F] {
+class DogDoobieRepositoryAdapter[F[_]: Async](val xa: Transactor[F])
+    extends DogRepositoryAlgebra[F] {
 
   import DogSql._
 

@@ -2,7 +2,8 @@ package rescueme.com.app.domain.shelter
 
 import cats.Applicative
 import cats.data.EitherT
-import rescueme.com.app.domain.{Identifier, ShelterNotFound}
+import rescueme.com.app.domain.DomainError._
+import rescueme.com.app.domain.Identifier
 
 trait ShelterValidator[F[_]] {
   def exists(id: Identifier): EitherT[F, ShelterNotFound.type, Shelter]

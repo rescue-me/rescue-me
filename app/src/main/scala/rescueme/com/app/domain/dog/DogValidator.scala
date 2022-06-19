@@ -2,8 +2,8 @@ package rescueme.com.app.domain.dog
 
 import cats.Applicative
 import cats.data.EitherT
-import rescueme.com.app.domain.Identifier
 import rescueme.com.app.domain.DomainError._
+import rescueme.com.app.domain.Identifier
 
 trait DogValidator[F[_]] {
   def exists(id: Identifier): F[Either[DogNotFound, Dog]]

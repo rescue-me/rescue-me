@@ -2,7 +2,7 @@ package rescueme.com.app.domain.dog
 
 import rescueme.com.app.domain._
 
-import java.util.{Date, UUID}
+import java.util.Date
 
 case class DogDetail(
     dogId: Identifier,

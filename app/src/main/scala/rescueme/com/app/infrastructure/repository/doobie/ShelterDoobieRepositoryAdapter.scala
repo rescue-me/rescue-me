@@ -12,7 +12,8 @@ import java.util.UUID
 object ShelterSql {
 
   def insert(shelter: Shelter): Update0 =
-    sql"INSERT INTO shelter (id, name, province) VALUES (${UUID.randomUUID()},${shelter.name},${shelter.province})".update
+    sql"INSERT INTO shelter (id, name, province) VALUES (${UUID
+        .randomUUID()},${shelter.name},${shelter.province})".update
 
   def getAll: Query0[Shelter] = sql"SELECT * FROM shelter".query[Shelter]
 
@@ -20,7 +21,8 @@ object ShelterSql {
 
 }
 
-class ShelterDoobieRepositoryAdapter[F[_]: Async](val xa: Transactor[F]) extends ShelterRepositoryAlgebra[F] {
+class ShelterDoobieRepositoryAdapter[F[_]: Async](val xa: Transactor[F])
+    extends ShelterRepositoryAlgebra[F] {
 
   import ShelterSql._
 

@@ -11,7 +11,7 @@ case class DatabaseConfig(
     driver: String,
     user: String,
     password: String,
-    connections: DatabaseConnectionsConfig,
+    connections: DatabaseConnectionsConfig
 )
 
 object DatabaseConfig {

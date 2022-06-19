@@ -14,11 +14,7 @@ import rescueme.com.app.config.{DatabaseConfig, RescuemeConfig}
 import rescueme.com.app.domain.dog.{DogDetailService, DogService}
 import rescueme.com.app.domain.shelter.{ShelterService, ShelterValidator}
 import rescueme.com.app.infrastructure.endpoint.{DogEndpoint, ShelterEndpoint}
-import rescueme.com.app.infrastructure.repository.doobie.{
-  DogDetailRepositoryAdapter,
-  DogDoobieRepositoryAdapter,
-  ShelterDoobieRepositoryAdapter
-}
+import rescueme.com.app.infrastructure.repository.doobie.{DogDetailRepositoryAdapter, DogDoobieRepositoryAdapter, ShelterDoobieRepositoryAdapter}
 
 object Server extends IOApp {
 

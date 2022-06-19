@@ -7,7 +7,7 @@ import org.scalatest.matchers.should.Matchers
 import org.scalatest.{EitherValues, OptionValues}
 import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
-import rescueme.com.app.domain.ShelterNotFound
+import rescueme.com.app.domain.DomainError._
 import org.scalacheck.ScalacheckShapeless._
 import org.scalatest.funsuite.AnyFunSuite
 import cats.effect.unsafe.implicits.global

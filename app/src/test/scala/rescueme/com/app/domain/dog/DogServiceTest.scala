@@ -11,7 +11,7 @@ import org.scalatest.{EitherValues, OptionValues}
 import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
 import rescueme.com.app.domain.shelter.{Shelter, ShelterValidator}
-import rescueme.com.app.domain.{DogNotFound, ShelterNotFound}
+import rescueme.com.app.domain.DomainError._
 import cats.effect.unsafe.implicits.global
 
 import java.util.UUID
@@ -24,7 +24,7 @@ class DogServiceTest
     with EitherValues
     with OptionValues {
 
-  val shelter: Shelter                        = Shelter(Some(UUID.randomUUID()), "test-name", "test-description")
+  val shelter: Shelter = Shelter(Some(UUID.randomUUID()), "test-name", "test-description")
   val repo: DogRepositoryAlgebra[IO]          = mock[DogRepositoryAlgebra[IO]]
   val shelterValidation: ShelterValidator[IO] = mock[ShelterValidator[IO]]
   val dogService: DogService[IO]              = DogService.make[IO](repo, shelterValidation)
