@@ -2,9 +2,9 @@ package rescueme.com.app.domain.dog
 
 import cats.Monad
 import cats.data.EitherT
+import rescueme.com.app.domain.DomainError._
 import rescueme.com.app.domain.shelter.ShelterValidator
-import rescueme.com.app.domain.{DogNotFound, DomainError, Identifier}
-
+import rescueme.com.app.domain.{DomainError, Identifier}
 trait DogService[F[_]] {
   def all: F[List[Dog]]
   def create(dog: Dog): EitherT[F, DomainError, Dog]
@@ -13,7 +13,10 @@ trait DogService[F[_]] {
 }
 
 object DogService {
-  def make[F[_]: Monad](repository: DogRepositoryAlgebra[F], shelterValidation: ShelterValidator[F]): DogService[F] =
+  def make[F[_]: Monad](
+      repository: DogRepositoryAlgebra[F],
+      shelterValidation: ShelterValidator[F]
+  ): DogService[F] =
     new DogService[F] {
       def all: F[List[Dog]] = repository.all()
 
@@ -23,7 +26,8 @@ object DogService {
           created <- EitherT.liftF(repository.create(dog))
         } yield created
 
-      def get(id: Identifier): EitherT[F, DogNotFound.type, Dog] = EitherT.fromOptionF(repository.get(id), DogNotFound)
+      def get(id: Identifier): EitherT[F, DogNotFound.type, Dog] =
+        EitherT.fromOptionF(repository.get(id), DogNotFound)
 
       def getByShelter(shelterId: Identifier): F[List[Dog]] = repository.getByShelter(shelterId)
 

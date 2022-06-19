@@ -14,8 +14,7 @@ trait DogDetailService[F[_]] {
 
 object DogDetailService {
   def make[F[_]: MonadThrow](
-      dogRepository: DogDetailRepositoryAlgebra[F],
-      dogValidatorInterpreter: DogValidator[F]
+      dogRepository: DogDetailRepositoryAlgebra[F]
   ): DogDetailService[F] =
     new DogDetailService[F] {
 
@@ -23,29 +22,16 @@ object DogDetailService {
         EitherT.fromOptionF(dogRepository.getDetails(id), DogNotFound).value
 
       override def update(dogDetail: DogDetail): F[DogDetail] =
-        for {
-          _ <- dogValidatorInterpreter
-            .exists(dogDetail.dogId)
-            .flatMap { case Left(_) =>
-              DogDetailsNotUpdated.raiseError
-            }
-
-          result <- dogRepository.updateDetails(dogDetail).flatMap {
-            case None          => DogDetailsNotUpdated.raiseError
-            case Some(details) => details.pure[F]
-          }
-
-        } yield result
+        dogRepository.updateDetails(dogDetail).flatMap {
+          case None          => DogDetailsNotUpdated.raiseError[F, DogDetail]
+          case Some(details) => details.pure[F]
+        }
 
       override def create(dogDetail: DogDetail): F[Either[DogAlreadyExists, DogDetail]] =
-        for {
-          _ <-
-            dogRepository.getDetails(dogDetail.dogId) flatMap {
-              case Some(_) =>
-                Either.left[DogDetailsAlreadyExists.type, Unit](DogDetailsAlreadyExists).pure[F]
-              case None => Either.right[DogDetailsAlreadyExists.type, Unit](()).pure[F]
-            }
-          created <- dogRepository.createDetails(dogDetail)
-        } yield created
+        dogRepository.getDetails(dogDetail.dogId).flatMap {
+          case Some(_) => DogAlreadyExists.asLeft[DogDetail].pure[F]
+          case None    => dogRepository.createDetails(dogDetail).map(Right(_))
+        }
+
     }
 }

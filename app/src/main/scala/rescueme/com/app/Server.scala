@@ -11,10 +11,14 @@ import org.http4s.server.{Router, Server => H4Server}
 import org.typelevel.log4cats.slf4j.Slf4jLogger
 import org.typelevel.log4cats.{Logger, SelfAwareStructuredLogger}
 import rescueme.com.app.config.{DatabaseConfig, RescuemeConfig}
-import rescueme.com.app.domain.dog.{DogDetailService, DogService, DogValidator}
+import rescueme.com.app.domain.dog.{DogDetailService, DogService}
 import rescueme.com.app.domain.shelter.{ShelterService, ShelterValidator}
 import rescueme.com.app.infrastructure.endpoint.{DogEndpoint, ShelterEndpoint}
-import rescueme.com.app.infrastructure.repository.doobie.{DogDetailRepositoryAdapter, DogDoobieRepositoryAdapter, ShelterDoobieRepositoryAdapter}
+import rescueme.com.app.infrastructure.repository.doobie.{
+  DogDetailRepositoryAdapter,
+  DogDoobieRepositoryAdapter,
+  ShelterDoobieRepositoryAdapter
+}
 
 object Server extends IOApp {
 
@@ -34,9 +38,8 @@ object Server extends IOApp {
       shelterValidation = ShelterValidator.make[F](shelterRepo)
       dogService        = DogService.make[F](dogRepo, shelterValidation)
       shelterService    = ShelterService.make[F](shelterRepo)
-      dogValidation     = DogValidator.make[F](dogRepo)
       dogDetailRepo     = DogDetailRepositoryAdapter.make(xa)
-      dogDetailService  = DogDetailService.make(dogDetailRepo, dogValidation)
+      dogDetailService  = DogDetailService.make(dogDetailRepo)
       httpApp = Router(
         "/api/dog"     -> DogEndpoint.endpoints(dogService, dogDetailService),
         "/api/shelter" -> ShelterEndpoint.endpoints(shelterService)

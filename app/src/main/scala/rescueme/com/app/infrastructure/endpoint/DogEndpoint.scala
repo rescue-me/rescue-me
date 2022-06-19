@@ -72,7 +72,7 @@ class DogEndpoint[F[_]: Async] {
 
     HttpRoutes.of[F] {
       case GET -> Root / UUIDVar(id) / "details" =>
-        dogDetailsService.get(id).value flatMap {
+        dogDetailsService.get(id) flatMap {
           case Left(_)        => BadRequest(s"Dog with id: $id not found")
           case Right(details) => Ok(details.toResponse.asJson)
         }
@@ -80,7 +80,7 @@ class DogEndpoint[F[_]: Async] {
         for {
           dogDetails <- req.as[DogDetailsRequest].map(_.toDogDetails(id))
           created <- withValidation(sameId(id, dogDetails)) { valid =>
-            dogDetailsService.create(valid).value match {
+            dogDetailsService.create(valid) match {
               case Left                      => InternalServerError()
               case Right(created: DogDetail) => Ok(created.toResponse.asJson)
             }
@@ -90,7 +90,7 @@ class DogEndpoint[F[_]: Async] {
         for {
           dogDetails <- req.as[DogDetailsRequest].map(_.toDogDetails(id))
           created <- withValidation(sameId(id, dogDetails)) { valid =>
-            dogDetailsService.update(valid).value match {
+            dogDetailsService.update(valid) match {
               case Left                      => InternalServerError()
               case Right(created: DogDetail) => Ok(created.toResponse.asJson)
             }
