@@ -1,7 +1,6 @@
 package rescueme.com.app.domain.dog
 
 import cats.Monad
-import cats.data.EitherT
 import cats.implicits._
 import rescueme.com.app.domain.DomainError._
 import rescueme.com.app.domain.Identifier
@@ -10,7 +9,7 @@ import rescueme.com.app.domain.shelter.ShelterValidator
 trait DogService[F[_]] {
   def all: F[List[Dog]]
   def create(dog: Dog): F[Either[ShelterNotFound, Dog]]
-  def get(id: Identifier): EitherT[F, DogNotFound.type, Dog]
+  def get(id: Identifier): F[Option[Dog]]
   def getByShelter(shelterId: Identifier): F[List[Dog]]
 }
 
@@ -30,8 +29,8 @@ object DogService {
             case Right(_)    => repository.create(dog).map(_.asRight)
           }
 
-      def get(id: Identifier): EitherT[F, DogNotFound.type, Dog] =
-        EitherT.fromOptionF(repository.get(id), DogNotFound)
+      def get(id: Identifier): F[Option[Dog]] =
+        repository.get(id)
 
       def getByShelter(shelterId: Identifier): F[List[Dog]] = repository.getByShelter(shelterId)
 

@@ -78,7 +78,7 @@ class DogServiceTest
     forAll { (dog: Dog, shelterId: UUID) =>
       when(repo.get(shelterId)).thenReturn(Some(dog).pure[IO])
 
-      val retrieved = dogService.get(shelterId).value.unsafeRunSync()
+      val retrieved = dogService.get(shelterId).unsafeRunSync()
       retrieved.value shouldBe dog
     }
 
@@ -88,8 +88,8 @@ class DogServiceTest
     forAll { (dog: Dog, shelterId: UUID) =>
       when(repo.get(shelterId)).thenReturn(None.pure[IO])
 
-      val retrieved = dogService.get(shelterId).value.unsafeRunSync()
-      retrieved shouldBe Left(DogNotFound)
+      val retrieved = dogService.get(shelterId).unsafeRunSync()
+      retrieved shouldBe None
     }
   }
 

@@ -59,9 +59,9 @@ class DogEndpoint[F[_]: Async] {
 
   private def get(dogService: DogService[F]): HttpRoutes[F] = {
     HttpRoutes.of[F] { case GET -> Root / UUIDVar(id) =>
-      dogService.get(id).value flatMap {
-        case Left(_)    => BadRequest(s"Dog with id: $id not found")
-        case Right(dog) => Ok(dog.asJson)
+      dogService.get(id) flatMap {
+        case None      => BadRequest(s"Dog with id: $id not found")
+        case Some(dog) => Ok(dog.asJson)
       }
     }
   }
