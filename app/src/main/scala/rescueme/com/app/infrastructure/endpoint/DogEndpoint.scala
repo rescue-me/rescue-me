@@ -48,7 +48,7 @@ class DogEndpoint[F[_]: Async] {
     HttpRoutes.of[F] { case req @ POST -> Root =>
       val result = for {
         dog <- req.as[Dog]
-        res <- dogService.create(dog).value
+        res <- dogService.create(dog)
       } yield res
       result.flatMap {
         case Right(dogCreated) => Ok(dogCreated.asJson)

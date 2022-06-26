@@ -32,9 +32,9 @@ class DogServiceTest
   test("should create dog") {
     forAll { dog: Dog =>
       when(repo.create(dog)).thenReturn(IO.pure(dog))
-      when(shelterValidation.exists(dog.shelterId)).thenReturn(EitherT.pure(shelter))
+      when(shelterValidation.exists(dog.shelterId)).thenReturn(IO.pure(Right(shelter)))
 
-      val result = dogService.create(dog).value.unsafeRunSync()
+      val result = dogService.create(dog).unsafeRunSync()
 
       result.value shouldBe dog
 
@@ -44,9 +44,9 @@ class DogServiceTest
 
   test("should return left when creating dog with not found shelter") {
     forAll { dog: Dog =>
-      when(shelterValidation.exists(dog.shelterId)).thenReturn(EitherT.leftT(ShelterNotFound))
+      when(shelterValidation.exists(dog.shelterId)).thenReturn(IO.pure(Left(ShelterNotFound)))
 
-      val result = dogService.create(dog).value.unsafeRunSync()
+      val result = dogService.create(dog).unsafeRunSync()
 
       result shouldBe Left(ShelterNotFound)
     }

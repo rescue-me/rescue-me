@@ -7,6 +7,7 @@ object DomainError {
   type DogNotFound          = DogNotFound.type
   type DogAlreadyExists     = DogAlreadyExists.type
   type DogDetailsNotUpdated = DogDetailsNotUpdated.type
+  type ShelterNotFound      = ShelterNotFound.type
 
   case object DogNotFound             extends DomainError
   case object DogAlreadyExists        extends DomainError
