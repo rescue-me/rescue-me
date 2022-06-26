@@ -8,17 +8,21 @@ import io.circe.generic.auto._
 import org.http4s.ember.server.EmberServerBuilder
 import org.http4s.implicits._
 import org.http4s.server.{Router, Server => H4Server}
+import org.typelevel.log4cats.Logger
 import org.typelevel.log4cats.slf4j.Slf4jLogger
-import org.typelevel.log4cats.{Logger, SelfAwareStructuredLogger}
 import rescueme.com.app.config.{DatabaseConfig, RescuemeConfig}
 import rescueme.com.app.domain.dog.{DogDetailService, DogService}
 import rescueme.com.app.domain.shelter.{ShelterService, ShelterValidator}
 import rescueme.com.app.infrastructure.endpoint.{DogEndpoint, ShelterEndpoint}
-import rescueme.com.app.infrastructure.repository.doobie.{DogDetailRepositoryAdapter, DogDoobieRepositoryAdapter, ShelterDoobieRepositoryAdapter}
+import rescueme.com.app.infrastructure.repository.doobie.{
+  DogDetailRepositoryAdapter,
+  DogDoobieRepositoryAdapter,
+  ShelterDoobieRepositoryAdapter
+}
 
 object Server extends IOApp {
 
-  implicit val logger: SelfAwareStructuredLogger[IO] = Slf4jLogger.getLogger[IO]
+  implicit val logger: Logger[IO] = Slf4jLogger.getLogger[IO]
 
   override def run(args: List[String]): IO[ExitCode] =
     createServer[IO].useForever

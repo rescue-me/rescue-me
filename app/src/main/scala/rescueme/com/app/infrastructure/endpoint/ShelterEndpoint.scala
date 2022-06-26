@@ -7,9 +7,10 @@ import io.circe.syntax._
 import org.http4s.circe._
 import org.http4s.dsl.Http4sDsl
 import org.http4s.{EntityDecoder, HttpRoutes}
+import org.typelevel.log4cats.Logger
 import rescueme.com.app.domain.shelter.{Shelter, ShelterService}
 
-class ShelterEndpoint[F[_]: Async] extends Http4sDsl[F] {
+class ShelterEndpoint[F[_]: Async: Logger] extends Http4sDsl[F] {
 
   implicit val shelterDecoder: EntityDecoder[F, Shelter] = jsonOf
 
@@ -30,26 +31,29 @@ class ShelterEndpoint[F[_]: Async] extends Http4sDsl[F] {
     HttpRoutes.of[F] { case req @ POST -> Root =>
       val result = for {
         shelter <- req.as[Shelter]
-        res     <- shelterService.create(shelter).value
+        res     <- shelterService.create(shelter)
       } yield res
-      result.flatMap {
-        case Right(shelterCreated) => Ok(shelterCreated.asJson)
-        case Left(_)               => Conflict(s"A shelter with these fields already exists")
-      }
+      result
+        .flatMap(r => Ok(r.asJson))
+        .handleErrorWith(thr =>
+          Logger[F].error(thr)("Error creating shelter") *> Conflict(
+            s"A shelter with these fields already exists"
+          )
+        )
     }
   }
 
   private def get(shelterService: ShelterService[F]): HttpRoutes[F] = {
     HttpRoutes.of[F] { case GET -> Root / UUIDVar(id) =>
-      shelterService.get(id).value flatMap {
-        case Left(_)        => BadRequest(s"Shelter with id: $id not found")
-        case Right(shelter) => Ok(shelter.asJson)
+      shelterService.get(id) flatMap {
+        case None          => BadRequest(s"Shelter with id: $id not found")
+        case Some(shelter) => Ok(shelter.asJson)
       }
     }
   }
 
 }
 object ShelterEndpoint {
-  def endpoints[F[_]: Async](shelterService: ShelterService[F]): HttpRoutes[F] =
+  def endpoints[F[_]: Async: Logger](shelterService: ShelterService[F]): HttpRoutes[F] =
     new ShelterEndpoint[F].endpoints(shelterService)
 }

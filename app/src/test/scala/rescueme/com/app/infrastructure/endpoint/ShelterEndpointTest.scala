@@ -18,6 +18,8 @@ import rescueme.com.app.infrastructure.repository.ShelterStubRepository
 import org.scalacheck.ScalacheckShapeless._
 import org.scalatest.funsuite.AnyFunSuite
 import cats.effect.unsafe.implicits.global
+import org.typelevel.log4cats.Logger
+import org.typelevel.log4cats.slf4j.Slf4jLogger
 
 class ShelterEndpointTest
     extends AnyFunSuite
@@ -27,6 +29,7 @@ class ShelterEndpointTest
     with Http4sClientDsl[IO]
     with OptionValues {
 
+  implicit val logger: Logger[IO] = Slf4jLogger.getLogger[IO]
   implicit val entityDecoder: EntityDecoder[IO, Shelter] = jsonOf[IO, Shelter]
   implicit val entityEncoder: EntityEncoder[IO, Shelter] = jsonEncoderOf[IO, Shelter]
   val service: ShelterService[IO]                        = ShelterService.make[IO](ShelterStubRepository)

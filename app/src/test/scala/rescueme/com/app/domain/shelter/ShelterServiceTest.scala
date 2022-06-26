@@ -30,9 +30,9 @@ class ShelterServiceTest
     forAll { shelter: Shelter =>
       when(repositoryAlgebra.create(shelter)).thenReturn(IO.pure(shelter))
 
-      val result = shelterService.create(shelter).value.unsafeRunSync()
+      val result = shelterService.create(shelter).unsafeRunSync()
 
-      result.value shouldBe shelter
+      result shouldBe shelter
     }
   }
 
@@ -51,7 +51,7 @@ class ShelterServiceTest
       val id = UUID.randomUUID()
       when(repositoryAlgebra.get(id)).thenReturn(IO.pure(Some(shelter)))
 
-      val result = shelterService.get(id).value.unsafeRunSync()
+      val result = shelterService.get(id).unsafeRunSync()
 
       result.value shouldBe shelter
     }
@@ -62,9 +62,9 @@ class ShelterServiceTest
       val id = UUID.randomUUID()
       when(repositoryAlgebra.get(id)).thenReturn(IO.pure(None))
 
-      val result = shelterService.get(id).value.unsafeRunSync()
+      val result = shelterService.get(id).unsafeRunSync()
 
-      result shouldBe Left(ShelterNotFound)
+      result shouldBe None
     }
   }
 
